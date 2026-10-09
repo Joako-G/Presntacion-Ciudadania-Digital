@@ -1,0 +1,13 @@
+PRESENTACIÓN WEB: CIUDADANÍA DIGITAL
+
+1. Abra index.html con Microsoft Edge, Chrome o Firefox.
+2. Use los botones o las flechas izquierda/derecha para cambiar de diapositiva.
+3. El botón “Notas” muestra un guion breve y los principios de Mayer aplicados.
+4. El botón “Escuchar” utiliza la voz disponible en el navegador y no envía el texto a este proyecto.
+5. El botón de pantalla completa mejora la proyección en clase.
+6. La simulación es local: no captura datos, no descarga archivos y solo desactiva los controles de la presentación durante tres segundos.
+
+La carpeta “assets” debe permanecer junto a index.html para que las imágenes se vean.
+
+NOTA SOBRE NOTEBOOKLM
+El borrador del grupo indica que NotebookLM es obligatorio. Esta versión incorpora el contenido del borrador, pero no afirma haber utilizado NotebookLM. Si la cátedra exige evidencia de uso, todavía deben cargar allí las fuentes y conservar el resultado o registro correspondiente.

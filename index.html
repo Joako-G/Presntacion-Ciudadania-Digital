@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07131f">
+  <title>Ciudadanía digital: decisiones que protegen</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f5fbff;
+      --muted: #a9bdc9;
+      --bg: #06111b;
+      --surface: #0c1d2a;
+      --cyan: #43e6ef;
+      --coral: #ff6b64;
+      --lime: #c9ff58;
+      --line: rgba(183, 226, 238, .22);
+      --shadow: 0 24px 70px rgba(0, 0, 0, .45);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
+    body { overflow: hidden; }
+    button { font: inherit; }
+    button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--lime); outline-offset: 4px; }
+
+    .app {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: 5px 1fr auto;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(67,230,239,.12), transparent 34%),
+        radial-gradient(circle at 90% 85%, rgba(255,107,100,.10), transparent 30%),
+        var(--bg);
+    }
+
+    .progress { background: rgba(255,255,255,.08); overflow: hidden; }
+    .progress span { display: block; width: 12.5%; height: 100%; background: var(--cyan); transition: width .35s ease; }
+
+    .deck { position: relative; min-height: 0; }
+    .slide {
+      display: none;
+      position: absolute;
+      inset: 0;
+      padding: clamp(1.5rem, 4vw, 4.5rem) clamp(1.2rem, 6vw, 7rem);
+      overflow: auto;
+      align-content: center;
+      animation: enter .42s ease both;
+    }
+    .slide.active { display: grid; }
+    @keyframes enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    /* Motion is deliberately brief and tied to information hierarchy, not decoration. */
+    @media (prefers-reduced-motion: no-preference) {
+      .slide.active > :not(.speaker-notes) { animation: content-enter .42s .04s ease both; }
+      .slide.active .hero-grid > *, .slide.active .two-col > * { animation: content-enter .46s ease both; }
+      .slide.active .hero-grid > *:nth-child(2), .slide.active .two-col > *:nth-child(2) { animation-delay: .14s; }
+      .slide.active .concept, .slide.active .step, .slide.active .data-item, .slide.active .recovery > *, .slide.active .quiz-option { animation: content-enter .36s ease both; }
+      .slide.active .concept:nth-child(2), .slide.active .step:nth-child(2), .slide.active .data-item:nth-child(2), .slide.active .recovery > *:nth-child(2), .slide.active .quiz-option:nth-child(2) { animation-delay: .07s; }
+      .slide.active .concept:nth-child(3), .slide.active .step:nth-child(3), .slide.active .data-item:nth-child(3), .slide.active .recovery > *:nth-child(3), .slide.active .quiz-option:nth-child(3) { animation-delay: .14s; }
+      .slide.active .concept:nth-child(4), .slide.active .step:nth-child(4), .slide.active .data-item:nth-child(4), .slide.active .recovery > *:nth-child(4) { animation-delay: .21s; }
+      .slide.active .fake-message { animation: message-emphasis 2.8s .4s ease-in-out 1 both; }
+      .slide.active .signal-word { animation: keyword-underline .52s .48s ease-out both; }
+      .slide.active .signal-word.delayed { animation-delay: .78s; }
+      .slide.active .recovery .action-reveal { animation: action-reveal .32s .16s ease-out both; }
+      .slide.active .recovery > *:nth-child(2) .action-reveal { animation-delay: .23s; }
+      .slide.active .recovery > *:nth-child(3) .action-reveal { animation-delay: .30s; }
+      .slide.active .recovery > *:nth-child(4) .action-reveal { animation-delay: .37s; }
+      .slide.active .demo-stage .big { animation: attention-breathe 2.4s .4s ease-in-out 2 both; }
+      .timer.counting { animation: timer-pulse .7s ease-in-out infinite; }
+      .feedback-pop { animation: feedback-pop .32s ease-out both; }
+      dialog[open] .lock-content { animation: content-enter .3s ease-out both; }
+    }
+    @keyframes content-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes message-emphasis { 0%, 100% { transform: rotate(1.5deg); } 45% { transform: rotate(1.5deg) translateY(-5px); box-shadow: 0 28px 78px rgba(255,107,100,.18); } }
+    @keyframes attention-breathe { 50% { transform: scale(1.035); color: var(--cyan); } }
+    @keyframes timer-pulse { 50% { transform: scale(1.06); color: #ffd5d1; } }
+    @keyframes feedback-pop { from { opacity: .35; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes keyword-underline { from { background-size: 0 100%; color: var(--ink); } to { background-size: 100% 100%; color: #06111b; } }
+    @keyframes action-reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .eyebrow {
+      margin: 0 0 .8rem;
+      color: var(--cyan);
+      font-size: clamp(.76rem, 1.3vw, .95rem);
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 12ch; margin-bottom: 1rem; font-size: clamp(3.2rem, 8vw, 7.5rem); line-height: .9; letter-spacing: -.065em; }
+    h2 { max-width: 18ch; margin-bottom: 1.8rem; font-size: clamp(2.4rem, 5.5vw, 5.2rem); line-height: .95; letter-spacing: -.045em; }
+    h3 { margin-bottom: .55rem; font-size: clamp(1.2rem, 2vw, 1.7rem); }
+    p { color: var(--muted); font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.52; }
+    strong { color: var(--ink); }
+    .signal-word { padding: .03em .18em; border-radius: .18em; background: linear-gradient(var(--lime), var(--lime)) no-repeat 0 50% / 100% 100%; color: #06111b; }
+    .accent { color: var(--lime); }
+    .coral { color: var(--coral); }
+
+    .hero-grid, .two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, .85fr); gap: clamp(2rem, 6vw, 7rem); align-items: center; }
+    .hook {
+      border-left: 3px solid var(--coral);
+      padding-left: 1.1rem;
+      max-width: 32rem;
+    }
+
+    .choices, .actions { display: flex; flex-wrap: wrap; gap: .8rem; }
+    .button {
+      min-height: 3rem;
+      border: 1px solid var(--line);
+      border-radius: .8rem;
+      padding: .82rem 1.15rem;
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .button:hover { transform: translateY(-2px); border-color: var(--cyan); background: rgba(67,230,239,.10); }
+    .button.primary { border-color: transparent; background: var(--cyan); color: #031317; font-weight: 850; }
+    .button.danger { border-color: rgba(255,107,100,.55); color: #ffd5d1; }
+    .button.ghost { background: transparent; }
+
+    .fake-message {
+      max-width: 29rem;
+      padding: clamp(1.2rem, 3vw, 2rem);
+      border: 1px solid rgba(255,107,100,.4);
+      border-radius: 1.4rem;
+      background: linear-gradient(145deg, rgba(255,107,100,.12), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      transform: rotate(1.5deg);
+    }
+    .fake-message small { color: var(--coral); font-weight: 800; }
+    .fake-message p { margin: .9rem 0; color: var(--ink); }
+    .url { display: block; padding: .8rem; border-radius: .55rem; background: #02080d; color: var(--cyan); overflow-wrap: anywhere; }
+    .answer { min-height: 1.8rem; margin-top: 1rem; color: var(--lime); font-weight: 750; }
+
+    .concepts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .concept {
+      min-height: 15rem;
+      padding: 1.35rem;
+      border-top: 4px solid var(--cyan);
+      background: linear-gradient(180deg, rgba(12,29,42,.98), rgba(12,29,42,.5));
+    }
+    .concept:nth-child(2) { border-color: var(--coral); }
+    .concept:nth-child(3) { border-color: var(--lime); }
+    .concept:nth-child(4) { border-color: #a88cff; }
+    .concept .number { display: block; margin-bottom: 2.5rem; color: var(--muted); font-weight: 800; }
+    .concept p { font-size: 1rem; }
+
+    figure { margin: 0; }
+    .visual img { display: block; width: 100%; max-height: 54svh; object-fit: cover; border-radius: 1rem; box-shadow: var(--shadow); }
+    figcaption { margin-top: .7rem; color: var(--muted); font-size: .92rem; line-height: 1.4; }
+
+    .clue-panel { display: grid; gap: .75rem; }
+    .clue {
+      width: 100%;
+      border: 0;
+      border-left: 3px solid var(--line);
+      padding: .85rem 1rem;
+      text-align: left;
+      background: rgba(255,255,255,.03);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .clue span { display: block; max-height: 0; overflow: hidden; color: var(--muted); opacity: 0; transform: translateY(-4px); transition: max-height .25s ease, margin .25s ease, opacity .2s ease, transform .2s ease; }
+    .clue.open { border-color: var(--lime); background: rgba(201,255,88,.08); }
+    .clue.open span { max-height: 5rem; margin-top: .45rem; opacity: 1; transform: translateY(0); }
+    .counter { color: var(--cyan); font-weight: 800; }
+
+    .demo-stage {
+      display: grid;
+      place-items: center;
+      min-height: 20rem;
+      border: 1px solid var(--line);
+      border-radius: 1.3rem;
+      background: repeating-linear-gradient(135deg, rgba(67,230,239,.035) 0 16px, transparent 16px 32px);
+      text-align: center;
+      padding: 2rem;
+    }
+    .demo-stage .big { margin: 0; color: var(--ink); font-size: clamp(1.8rem, 4vw, 3.6rem); font-weight: 850; }
+    .safety-note { max-width: 48rem; margin-top: 1rem; color: var(--muted); font-size: .95rem; }
+
+    .steps { display: grid; gap: .7rem; counter-reset: step; }
+    .step { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+    .step::before { counter-increment: step; content: counter(step, decimal-leading-zero); color: var(--cyan); font-size: 1rem; font-weight: 900; }
+    .step p { margin: .2rem 0 0; font-size: 1rem; }
+
+    .data-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem; margin-top: 1rem; }
+    .data-item { padding: .8rem; border-left: 3px solid var(--coral); background: rgba(255,255,255,.035); }
+
+    .recovery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .recovery article, .incident { position: relative; min-height: 14rem; padding: 1.2rem; border: 1px solid var(--line); background: rgba(12,29,42,.72); }
+    .recovery b { display: block; margin-bottom: 3rem; color: var(--coral); }
+    .incident { text-align: left; color: var(--ink); cursor: pointer; }
+    .incident:hover, .incident.selected { border-color: var(--cyan); background: rgba(67,230,239,.10); }
+    .recovery p { font-size: 1rem; }
+
+    .quiz { max-width: 62rem; }
+    .quiz-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+    .quiz-option { min-height: 7rem; text-align: left; }
+    .quiz-option.correct { border-color: var(--lime); background: rgba(201,255,88,.12); }
+    .quiz-option.incorrect { border-color: var(--coral); background: rgba(255,107,100,.10); }
+    .quiz-feedback { min-height: 3.5rem; margin-top: 1rem; color: var(--ink); font-weight: 700; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: .8rem clamp(1rem, 3vw, 2rem);
+      border-top: 1px solid var(--line);
+      background: rgba(4,13,21,.92);
+      backdrop-filter: blur(16px);
+    }
+    .nav { display: flex; gap: .55rem; }
+    .nav:last-child { justify-content: flex-end; }
+    .slide-count { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .icon-button { min-width: 2.8rem; min-height: 2.8rem; padding: .55rem .8rem; }
+
+    .notes-drawer {
+      position: fixed;
+      right: 1rem;
+      bottom: 5rem;
+      z-index: 20;
+      width: min(30rem, calc(100vw - 2rem));
+      max-height: min(70svh, 36rem);
+      overflow: auto;
+      padding: 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: #0b1a26;
+      box-shadow: var(--shadow);
+    }
+    .notes-drawer[hidden] { display: none; }
+    .notes-drawer h3 { color: var(--cyan); }
+    .notes-drawer p, .notes-drawer li { color: var(--muted); line-height: 1.5; }
+    .speaker-notes { display: none; }
+
+    dialog {
+      width: min(44rem, calc(100vw - 2rem));
+      border: 1px solid rgba(255,107,100,.5);
+      border-radius: 1.2rem;
+      padding: 0;
+      color: var(--ink);
+      background: #08131c;
+      box-shadow: 0 35px 120px rgba(0,0,0,.8);
+    }
+    dialog::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(6px); }
+    .lock-content { padding: clamp(1.5rem, 5vw, 3rem); text-align: center; }
+    .timer { margin: 1rem 0; color: var(--coral); font-size: clamp(4rem, 13vw, 8rem); font-weight: 900; line-height: 1; }
+    .sim-result { color: var(--lime); font-weight: 800; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 880px) {
+      .slide { align-content: start; padding-top: 2.4rem; }
+      .hero-grid, .two-col { grid-template-columns: 1fr; gap: 1.5rem; }
+      .concepts, .recovery { grid-template-columns: repeat(2, 1fr); }
+      .visual img { max-height: 38svh; }
+      .controls { grid-template-columns: auto 1fr auto; }
+      .notes-label { display: none; }
+    }
+    @media (max-width: 560px) {
+      h1 { font-size: clamp(2.8rem, 16vw, 4.5rem); }
+      h2 { font-size: clamp(2.1rem, 11vw, 3.3rem); }
+      .concepts, .recovery, .quiz-options, .data-list { grid-template-columns: 1fr; }
+      .concept, .recovery article, .incident { min-height: auto; }
+      .concept .number, .recovery b { margin-bottom: 1rem; }
+      .button { padding: .72rem .9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <main class="deck" id="deck" aria-live="polite">
+      <section class="slide active" data-title="Decisión" aria-labelledby="s1-title">
+        <div class="hero-grid">
+          <div>
+            <p class="eyebrow">Ciudadanía digital</p>
+            <h1 id="s1-title">Una pausa puede proteger tu cuenta</h1>
+            <p class="hook">Recibes un mensaje: “Mamá, cambié de número. Es <span class="signal-word">urgente</span>. Envíame el <span class="signal-word delayed">código</span> que acaba de llegarte”. Tienes cinco segundos para decidir.</p>
+            <div class="choices" aria-label="Decisión inicial">
+              <button class="button danger" data-hook-answer="click">Enviar el código</button>
+              <button class="button primary" data-hook-answer="check">Llamar al número anterior</button>
+            </div>
+            <div class="answer" id="hookAnswer" role="status"></div>
+          </div>
+          <article class="fake-message" aria-label="Ejemplo ficticio de mensaje sospechoso">
+            <small>MENSAJE FICTICIO</small>
+            <p><strong>Hola, mamá. Cambié de número.</strong><br>Necesito el <span class="signal-word">código</span> que te llegó. Es <span class="signal-word delayed">urgente</span>.</p>
+            <code class="url">Contacto nuevo · mensaje ficticio</code>
+          </article>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Pida una decisión rápida y escuche dos o tres respuestas. No confirme todavía cuál es correcta: la tensión abre la pregunta central.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Coherencia:</strong> solo aparece la información necesaria. <strong>Señalización:</strong> el color coral marca la urgencia sospechosa. <strong>Personalización:</strong> el planteo conversa directamente con el grupo.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Conceptos" aria-labelledby="s2-title">
+        <div>
+          <p class="eyebrow">Antes de analizar</p>
+          <h2 id="s2-title">Cuatro ideas para decidir con seguridad</h2>
+          <div class="concepts">
+            <article class="concept"><span class="number">01</span><h3>Estafa</h3><p>Un engaño que busca dinero, datos o acceso.</p></article>
+            <article class="concept"><span class="number">02</span><h3>Suplantación</h3><p>Alguien se hace pasar por una persona u organización.</p></article>
+            <article class="concept"><span class="number">03</span><h3>Código de verificación</h3><p>Una llave temporal que nunca se comparte.</p></article>
+            <article class="concept"><span class="number">04</span><h3>Enlace sospechoso</h3><p>Un destino que debe revisarse antes de abrirlo.</p></article>
+          </div>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Defina cada término en una frase y pida un ejemplo cotidiano. Evite leer las tarjetas palabra por palabra.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Preentrenamiento:</strong> los conceptos aparecen antes de usarlos. <strong>Segmentación:</strong> cada tarjeta contiene una sola idea.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Phishing" aria-labelledby="s3-title">
+        <div class="two-col">
+          <figure class="visual">
+            <img src="assets/phishing-link-hesitation.png" alt="Una persona duda antes de tocar un enlace sospechoso en su teléfono">
+            <figcaption>La pausa antes de tocar permite revisar el remitente, el destino y el tono del mensaje.</figcaption>
+          </figure>
+          <div>
+            <p class="eyebrow">Actividad 1</p>
+            <h2 id="s3-title">Seis señales de un posible engaño</h2>
+            <p>Abra cada señal y explique por qué cambia la decisión.</p>
+            <div class="clue-panel">
+              <button class="clue" aria-expanded="false"><strong>Urgencia o amenaza</strong><span>Busca que reaccione antes de verificar.</span></button>
+              <button class="clue" aria-expanded="false"><strong>Premio inesperado</strong><span>Un beneficio improbable puede ser el anzuelo.</span></button>
+              <button class="clue" aria-expanded="false"><strong>Pedido de datos o códigos</strong><span>Las claves y códigos de verificación no se comparten.</span></button>
+              <button class="clue" aria-expanded="false"><strong>Enlace o archivo</strong><span>Conviene revisar el destino y evitar descargas no solicitadas.</span></button>
+              <button class="clue" aria-expanded="false"><strong>Identidad dudosa</strong><span>Una foto o un nombre conocido se pueden copiar.</span></button>
+              <button class="clue" aria-expanded="false"><strong>Detalles inconsistentes</strong><span>Errores, cambios de tono o datos que no coinciden son señales.</span></button>
+            </div>
+            <p class="counter" id="clueCount">0 de 6 señales abiertas</p>
+          </div>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Revele una señal por vez. Pregunte qué verificarían antes de tocar el enlace y destaque que un diseño convincente no demuestra autenticidad.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Contigüidad espacial:</strong> la leyenda queda junto a la imagen. <strong>Señalización:</strong> las pistas cambian de estado. <strong>Segmentación:</strong> la explicación se revela a demanda.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Simulación" aria-labelledby="s4-title">
+        <div class="two-col">
+          <div>
+            <p class="eyebrow">Demostración segura</p>
+            <h2 id="s4-title">¿Qué se siente al perder el control?</h2>
+            <p>La simulación desactiva únicamente esta presentación durante cinco segundos. No captura datos ni bloquea el navegador.</p>
+            <button class="button danger" id="startSimulation">Abrir enlace ficticio</button>
+            <p class="safety-note">Todo ocurre dentro de esta diapositiva. No bloquea el navegador, no descarga archivos y no usa internet.</p>
+          </div>
+          <div class="demo-stage" aria-hidden="true">
+            <div><p class="big">5 segundos</p><p>para sentir cómo una interfaz intenta quitar el control</p></div>
+          </div>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Antes de iniciar, aclare que es una simulación. Después pregunte qué señales generaron presión y qué salida segura deberían buscar.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Contigüidad temporal:</strong> la explicación sucede inmediatamente después de la experiencia. <strong>Coherencia:</strong> la interacción demuestra un único riesgo.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Cuentas" aria-labelledby="s5-title">
+        <div class="two-col">
+          <div>
+            <p class="eyebrow">Capas de protección</p>
+            <h2 id="s5-title">Una cuenta segura no depende de una sola barrera</h2>
+            <p>La meta no es recordar una contraseña imposible. Es reducir el daño si una capa falla.</p>
+          </div>
+          <div class="steps">
+            <article class="step"><div><h3>Frase de contraseña única</h3><p>Use una combinación larga y distinta para cada servicio. Un gestor puede recordarla.</p></div></article>
+            <article class="step"><div><h3>Segundo factor</h3><p>Active una aplicación autenticadora o el método más fuerte disponible.</p></div></article>
+            <article class="step"><div><h3>Sesiones bajo control</h3><p>Revise los dispositivos conectados y cierre los que no reconozca.</p></div></article>
+            <article class="step"><div><h3>Descargas y redes</h3><p>Instale desde fuentes oficiales y evite operaciones sensibles en redes públicas que no pueda verificar.</p></div></article>
+          </div>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Use la analogía de capas: si una puerta falla, todavía quedan otras. No pida contraseñas reales al grupo.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Modalidad:</strong> la pantalla muestra palabras clave mientras la explicación oral aporta el detalle. <strong>Redundancia:</strong> se evita un párrafo que replique toda la narración.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Redes sociales" aria-labelledby="s6-title">
+        <div class="two-col">
+          <div>
+            <p class="eyebrow">Redes sociales</p>
+            <h2 id="s6-title">WhatsApp y redes sociales también exigen verificar</h2>
+            <div class="data-list" aria-label="Datos que puede revelar una publicación">
+              <div class="data-item"><strong>“Cambié de número”</strong><br><span>confirme por el contacto anterior</span></div>
+              <div class="data-item"><strong>Perfil falso</strong><br><span>una foto no prueba identidad</span></div>
+              <div class="data-item"><strong>Promoción increíble</strong><br><span>revise la cuenta y el sitio oficial</span></div>
+              <div class="data-item"><strong>Noticia impactante</strong><br><span>compare antes de compartir</span></div>
+            </div>
+          </div>
+          <figure class="visual">
+            <img src="assets/digital-footprint-data-theft.png" alt="Datos luminosos salen del teléfono de un estudiante hacia una figura distante">
+            <figcaption>Una identidad visual se puede copiar. La verificación debe ocurrir por otro canal.</figcaption>
+          </figure>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Pida que observen la imagen y comparen las cuatro situaciones. Destaque que verificar por otro canal protege frente a la suplantación.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Multimedia:</strong> palabras e imagen construyen juntas la idea. <strong>Contigüidad espacial:</strong> la leyenda explica la imagen sin separarlas. <strong>Coherencia:</strong> no hay elementos decorativos ajenos al riesgo.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Recuperación" aria-labelledby="s7-title">
+        <div>
+          <p class="eyebrow">Si ya hizo clic</p>
+          <h2 id="s7-title">La respuesta depende de lo que ocurrió</h2>
+          <p>Seleccione una situación para ver el primer plan de acción.</p>
+          <div class="recovery" role="group" aria-label="Situaciones de recuperación">
+            <button class="button incident" data-incident="link"><b>01</b><strong class="action-reveal">Solo abrí el enlace</strong></button>
+            <button class="button incident" data-incident="password"><b>02</b><strong class="action-reveal">Ingresé mi contraseña</strong></button>
+            <button class="button incident" data-incident="bank"><b>03</b><strong class="action-reveal">Entregué datos bancarios</strong></button>
+            <button class="button incident" data-incident="account"><b>04</b><strong class="action-reveal">Perdí acceso a la cuenta</strong></button>
+          </div>
+          <p class="hook" id="recoveryAdvice" role="status">Primero identifique qué información o acceso pudo quedar expuesto.</p>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Normalice pedir ayuda. La vergüenza demora la respuesta y aumenta el daño. Distinga entre abrir un enlace, entregar credenciales e instalar un archivo.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Segmentación:</strong> la recuperación se divide en cuatro acciones. <strong>Señalización:</strong> la numeración hace visible el orden.</p>
+        </aside>
+      </section>
+
+      <section class="slide" data-title="Desafío" aria-labelledby="s8-title">
+        <div class="quiz">
+          <p class="eyebrow">Desafío final</p>
+          <h2 id="s8-title">Te llega un enlace de un amigo. ¿Qué dato cambia tu decisión?</h2>
+          <div class="quiz-options" role="group" aria-label="Opciones del desafío">
+            <button class="button quiz-option" data-quiz="wrong">Tiene su foto de perfil</button>
+            <button class="button quiz-option" data-quiz="right">Confirmó por otro canal que realmente lo envió</button>
+            <button class="button quiz-option" data-quiz="wrong">El mensaje dice que es urgente</button>
+          </div>
+          <p class="quiz-feedback" id="quizFeedback" role="status">Elija una respuesta y explique su razonamiento.</p>
+          <p class="hook"><strong>Regla para recordar:</strong> haga una pausa, verifique por otro canal y actúe desde el sitio o la aplicación oficial.</p>
+        </div>
+        <aside class="speaker-notes">
+          <h3>Guion sugerido</h3>
+          <p>Pida que justifiquen la elección. Cierre con una regla personal formulada por el grupo, no con una lista nueva de consejos.</p>
+          <h3>Principios de Mayer</h3>
+          <p><strong>Práctica de recuperación:</strong> el grupo aplica lo aprendido. <strong>Personalización:</strong> la decisión se plantea en segunda persona. <strong>Segmentación:</strong> una sola situación concentra el cierre.</p>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="controls" aria-label="Controles de la presentación">
+      <div class="nav">
+        <button class="button icon-button" id="prevBtn" aria-label="Diapositiva anterior">←</button>
+        <button class="button icon-button" id="notesBtn" aria-expanded="false" aria-controls="notesDrawer"><span aria-hidden="true">☰</span><span class="notes-label"> Notas</span></button>
+      </div>
+      <div class="slide-count"><span id="currentNumber">1</span> / 8 · <span id="currentTitle">Un clic</span></div>
+      <div class="nav">
+        <button class="button icon-button" id="fullscreenBtn" aria-label="Pantalla completa">⛶</button>
+        <button class="button ghost" id="audioBtn" aria-pressed="false"><span aria-hidden="true">🔊</span><span class="audio-label"> Escuchar</span></button>
+        <button class="button primary" id="nextBtn">Siguiente</button>
+      </div>
+    </footer>
+  </div>
+
+  <aside class="notes-drawer" id="notesDrawer" hidden aria-live="polite"></aside>
+
+  <dialog id="simulationDialog" aria-labelledby="simulationTitle">
+    <div class="lock-content">
+      <p class="eyebrow">Simulación educativa</p>
+      <h2 id="simulationTitle">Tu sesión fue comprometida</h2>
+      <div class="timer" id="timer" aria-live="polite">5</div>
+      <p id="simulationMessage">Detectamos actividad inusual. No cierre esta ventana.</p>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const progressBar = document.getElementById('progressBar');
+      const currentNumber = document.getElementById('currentNumber');
+      const currentTitle = document.getElementById('currentTitle');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const notesBtn = document.getElementById('notesBtn');
+      const notesDrawer = document.getElementById('notesDrawer');
+      const audioBtn = document.getElementById('audioBtn');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let current = 0;
+
+      function replayFeedback(element) {
+        if (reducedMotion) return;
+        element.classList.remove('feedback-pop');
+        void element.offsetWidth;
+        element.classList.add('feedback-pop');
+      }
+
+      function renderSlide(index) {
+        current = Math.max(0, Math.min(index, slides.length - 1));
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === current);
+          slide.setAttribute('aria-hidden', String(i !== current));
+        });
+        progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+        currentNumber.textContent = String(current + 1);
+        currentTitle.textContent = slides[current].dataset.title;
+        prevBtn.disabled = current === 0;
+        nextBtn.textContent = current === slides.length - 1 ? 'Volver al inicio' : 'Siguiente';
+        stopAudio();
+        closeNotes();
+        slides[current].focus({ preventScroll: true });
+      }
+
+      function closeNotes() {
+        notesDrawer.hidden = true;
+        notesBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      prevBtn.addEventListener('click', () => renderSlide(current - 1));
+      nextBtn.addEventListener('click', () => renderSlide(current === slides.length - 1 ? 0 : current + 1));
+
+      notesBtn.addEventListener('click', () => {
+        const opening = notesDrawer.hidden;
+        notesDrawer.hidden = !opening;
+        notesBtn.setAttribute('aria-expanded', String(opening));
+        if (opening) {
+          notesDrawer.innerHTML = slides[current].querySelector('.speaker-notes').innerHTML;
+          notesDrawer.focus();
+        }
+      });
+      notesDrawer.tabIndex = -1;
+
+      document.getElementById('fullscreenBtn').addEventListener('click', async () => {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (_) {
+          /* Fullscreen may be blocked by the browser; the presentation remains usable. */
+        }
+      });
+
+      function stopAudio() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        audioBtn.setAttribute('aria-pressed', 'false');
+        audioBtn.querySelector('.audio-label').textContent = ' Escuchar';
+      }
+
+      audioBtn.addEventListener('click', () => {
+        if (!('speechSynthesis' in window)) {
+          audioBtn.querySelector('.audio-label').textContent = ' Audio no disponible';
+          return;
+        }
+        if (audioBtn.getAttribute('aria-pressed') === 'true') {
+          stopAudio();
+          return;
+        }
+        const visibleCopy = slides[current].cloneNode(true);
+        visibleCopy.querySelector('.speaker-notes')?.remove();
+        visibleCopy.querySelectorAll('button').forEach(button => button.remove());
+        const utterance = new SpeechSynthesisUtterance(visibleCopy.innerText.replace(/\s+/g, ' ').trim());
+        utterance.lang = 'es-AR';
+        utterance.rate = 0.95;
+        utterance.onend = stopAudio;
+        utterance.onerror = stopAudio;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+        audioBtn.setAttribute('aria-pressed', 'true');
+        audioBtn.querySelector('.audio-label').textContent = ' Detener';
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (document.getElementById('simulationDialog').open) return;
+        if (event.key === 'ArrowRight' || event.key === 'PageDown') renderSlide(current + 1);
+        if (event.key === 'ArrowLeft' || event.key === 'PageUp') renderSlide(current - 1);
+        if (event.key === 'Escape') closeNotes();
+      });
+
+      let touchStartX = 0;
+      document.getElementById('deck').addEventListener('touchstart', event => {
+        touchStartX = event.changedTouches[0].clientX;
+      }, { passive: true });
+      document.getElementById('deck').addEventListener('touchend', event => {
+        const delta = event.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(delta) > 70) renderSlide(current + (delta < 0 ? 1 : -1));
+      }, { passive: true });
+
+      document.querySelectorAll('[data-hook-answer]').forEach(button => {
+        button.addEventListener('click', () => {
+          const answer = document.getElementById('hookAnswer');
+          answer.textContent = button.dataset.hookAnswer === 'check'
+            ? 'Buena decisión: confirmar por otro canal aporta evidencia.'
+            : 'La urgencia busca que comparta una llave de acceso antes de verificar.';
+          replayFeedback(answer);
+        });
+      });
+
+      const clues = [...document.querySelectorAll('.clue')];
+      clues.forEach(clue => clue.addEventListener('click', () => {
+        clue.classList.toggle('open');
+        clue.setAttribute('aria-expanded', String(clue.classList.contains('open')));
+        const count = clues.filter(item => item.classList.contains('open')).length;
+        const clueCount = document.getElementById('clueCount');
+        clueCount.textContent = `${count} de ${clues.length} señales abiertas`;
+        replayFeedback(clueCount);
+      }));
+
+      const dialog = document.getElementById('simulationDialog');
+      const timer = document.getElementById('timer');
+      const message = document.getElementById('simulationMessage');
+      let countdownId = null;
+      function resetSimulation() {
+        if (countdownId) clearInterval(countdownId);
+        countdownId = null;
+        if (dialog.open) dialog.close();
+        timer.textContent = '5';
+        timer.classList.remove('sim-result');
+        timer.classList.remove('counting');
+        message.textContent = 'Detectamos actividad inusual. No cierre esta ventana.';
+      }
+      document.getElementById('startSimulation').addEventListener('click', () => {
+        let seconds = 5;
+        resetSimulation();
+        dialog.showModal();
+        timer.textContent = String(seconds);
+        timer.classList.add('counting');
+        countdownId = setInterval(() => {
+          seconds -= 1;
+          timer.textContent = String(seconds);
+          if (seconds === 0) {
+            clearInterval(countdownId);
+            countdownId = null;
+            timer.textContent = 'FIN';
+            timer.classList.remove('counting');
+            timer.classList.add('sim-result');
+            message.textContent = 'Simulación finalizada. La urgencia y el bloqueo aparente intentaban dirigir su conducta.';
+            setTimeout(() => {
+              if (dialog.open) dialog.close();
+              renderSlide(3);
+            }, 260);
+          }
+        }, 1000);
+      });
+      dialog.addEventListener('cancel', event => event.preventDefault());
+
+      const recoveryMessages = {
+        link: 'Cierre la página. Si no ingresó datos ni instaló archivos, revise las descargas y vuelva al servicio desde su aplicación o dirección oficial.',
+        password: 'Cambie la contraseña desde el sitio oficial, cierre las sesiones abiertas y active el segundo factor. Cambie también cualquier contraseña reutilizada.',
+        bank: 'Comuníquese con la entidad por su canal oficial, informe lo ocurrido y siga sus indicaciones para proteger cuentas, tarjetas y operaciones.',
+        account: 'Inicie la recuperación oficial de la cuenta, avise a sus contactos por otro medio y revise los datos de recuperación cuando vuelva a ingresar.'
+      };
+      document.querySelectorAll('[data-incident]').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('[data-incident]').forEach(item => item.classList.remove('selected'));
+          option.classList.add('selected');
+          const advice = document.getElementById('recoveryAdvice');
+          advice.textContent = recoveryMessages[option.dataset.incident];
+          replayFeedback(advice);
+        });
+      });
+
+      document.querySelectorAll('[data-quiz]').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('[data-quiz]').forEach(item => item.classList.remove('correct', 'incorrect'));
+          const correct = option.dataset.quiz === 'right';
+          option.classList.add(correct ? 'correct' : 'incorrect');
+          const feedback = document.getElementById('quizFeedback');
+          feedback.textContent = correct
+            ? 'Correcto. La identidad visual puede copiarse; confirmar por otro canal aporta evidencia.'
+            : 'Todavía falta verificar. Una foto o la urgencia del mensaje no demuestran quién lo envió.';
+          replayFeedback(feedback);
+        });
+      });
+
+      renderSlide(0);
+    })();
+  </script>
+</body>
+</html>
