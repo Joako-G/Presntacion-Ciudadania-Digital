@@ -39,7 +39,7 @@ a{color:#3ee6ef}
 .group{display:flex;gap:10px;align-items:center}
 .group.right{justify-content:flex-end}
 .btn{min-height:56px;min-width:56px;padding:0 22px;border-radius:14px;border:1px solid #2a3440;background:#10161d;font-size:19px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .15s,border-color .15s,transform .15s}
-.btn[hidden]{display:none !important}
+#notesBtn,#audioBtn{display:none !important}
 .btn:hover{border-color:#3ee6ef;background:#0f1d22}
 .btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.35;cursor:default}
@@ -774,7 +774,6 @@ function go(i,full){
   [].forEach.call(dots.children,function(d,k){d.classList.toggle('on',k===cur);if(k<=cur)d.classList.add('seen')});
   document.getElementById('prev').disabled=cur===0&&shown===0;
   document.getElementById('nextLbl').textContent=cur===slides.length-1?'Inicio':'Siguiente';
-  var opening=cur===0;nb.hidden=opening;ab.hidden=opening;
   if(!document.getElementById('notes').hidden)fillNotes();
   history.replaceState(null,'','#'+(cur+1));
   if(s.id==='portada')startParticles();
@@ -849,6 +848,7 @@ setTimeout(function(){document.getElementById('hint').classList.add('off')},4500
 </script>
 </body>
 </html>
+
 
 
 
