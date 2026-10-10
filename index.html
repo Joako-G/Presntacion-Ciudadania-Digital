@@ -39,6 +39,7 @@ a{color:#3ee6ef}
 .group{display:flex;gap:10px;align-items:center}
 .group.right{justify-content:flex-end}
 .btn{min-height:56px;min-width:56px;padding:0 22px;border-radius:14px;border:1px solid #2a3440;background:#10161d;font-size:19px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .15s,border-color .15s,transform .15s}
+.btn[hidden]{display:none !important}
 .btn:hover{border-color:#3ee6ef;background:#0f1d22}
 .btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.35;cursor:default}
@@ -79,6 +80,15 @@ a{color:#3ee6ef}
 <div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:linear-gradient(0deg, #07090c 0%, #07090c 24%, rgba(7,9,12,0.45) 46%, rgba(7,9,12,0) 66%)"></div>
 <div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
 <canvas class="particles" aria-hidden="true"></canvas>
+<div data-build-in="fade 1 auto" aria-label="Integrantes del grupo" style="position:absolute;left:820px;top:82px;width:970px;padding:20px 26px;background:rgba(7,9,12,.82);border:1px solid rgba(62,230,239,.48);border-radius:18px;backdrop-filter:blur(12px);box-shadow:0 0 28px rgba(62,230,239,.16)">
+<p style="margin-bottom:12px;font-family:'JetBrains Mono','Courier New',monospace;font-size:18px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#3ee6ef">Integrantes</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;column-gap:32px;row-gap:10px;font-family:'Rubik',Arial,sans-serif;font-size:18px;line-height:1.25">
+<p><strong>Alarcón Arias Marisel Evelin</strong><br><span style="color:#a9b4bf">DNI: 46472192</span></p>
+<p><strong>Gallardo Matias Joaquin</strong><br><span style="color:#a9b4bf">DNI: 41401826</span></p>
+<p><strong>Mendoza Santiago Manuel</strong><br><span style="color:#a9b4bf">DNI: 42306132</span></p>
+<p><strong>Vilca Adriana Mercedes</strong><br><span style="color:#a9b4bf">DNI: 29491900</span></p>
+</div>
+</div>
 <div style="position:absolute;left:0;top:0;width:213px;height:8px;background:#3ee6ef;box-shadow:0 0 18px #3ee6ef"></div>
 <div data-build-in="fade 1 auto" style="position:absolute;left:128px;top:686px;width:1200px;display:flex;gap:16px;align-items:center">
 <x-icon name="Lock" style="color:#3ee6ef;width:40px;height:40px"></x-icon>
@@ -149,7 +159,7 @@ MAYER — Imagen: una escena que anticipa el riesgo, no la cara del presentador.
 <div style="flex:1;display:flex;gap:12px;align-items:center;padding:14px 20px;border:1px solid #3b3366;border-radius:14px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#a78bfa">04</p><p style="font-size:28px;font-weight:600">Enlace</p></div>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Punto de partida</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 02 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 02 / 10 →</p>
 <aside>EXPONE: integrante 1 · TIEMPO: 35 segundos.
 
 GUION: "Internet es como una ciudad: un espacio público donde tenemos derechos y responsabilidades, pero también riesgos que hay que saber detectar. Según UNICEF, pasamos entre cinco y seis horas por día frente a pantallas."
@@ -204,7 +214,7 @@ MAYER — Preentrenamiento: se presenta el marco y el mapa de conceptos antes de
 <p style="flex:1;font-size:28px">Un solo botón que te apura</p>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 03 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 03 / 10 →</p>
 <aside>EXPONE: integrante 1 · TIEMPO: 45 segundos.
 
 SECUENCIA (cada flecha → es un paso):
@@ -275,7 +285,7 @@ MAYER — Preentrenamiento: primero el concepto, después el caso. Señalizació
 <p data-build-in="pop 5" style="position:absolute;left:1600px;top:110px;width:170px;padding:8px 0;text-align:center;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:28px;font-weight:700;letter-spacing:3px;color:#07090c;background:#c6ff4f;border-radius:12px;transform:rotate(-6deg);box-shadow:0 0 24px rgba(198,255,79,0.6)">REAL</p>
 <p data-build-in="pop 5" style="position:absolute;left:1600px;top:437px;width:170px;padding:8px 0;text-align:center;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:28px;font-weight:700;letter-spacing:3px;color:#07090c;background:#ff5f57;border-radius:12px;transform:rotate(-6deg);box-shadow:0 0 24px rgba(255,95,87,0.6)">FALSO</p>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 04 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 04 / 10 →</p>
 <aside>EXPONE: integrante 2 · TIEMPO: 45 segundos.
 
 SECUENCIA (cada flecha → es un paso):
@@ -341,7 +351,7 @@ function run(){S.forEach(function(s){setTimeout(s[1],s[0])});setTimeout(run,1650
 <p style="flex:1;font-size:26px">Extra: activá la verificación en 2 pasos</p>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 05 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 05 / 10 →</p>
 <aside>EXPONE: integrante 2 · TIEMPO: 45 segundos.
 
 SECUENCIA (cada flecha → es un paso):
@@ -428,7 +438,7 @@ run();
 <p style="flex:1;font-size:28px;font-weight:600">Cerrá la pestaña sin tocar nada</p>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 06 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 06 / 10 →</p>
 <aside>EXPONE: integrante 3 · TIEMPO: 45 segundos.
 
 SECUENCIA (cada flecha → es un paso):
@@ -470,7 +480,7 @@ MAYER — Preentrenamiento: concepto antes del caso. Contigüidad espacial: los 
 <div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:34px;font-weight:700"><span style="color:#ff5f57">Capa 4 ·</span> Descargas y Wi-Fi con cuidado</h3><p style="font-size:26px;color:#a9b4bf">Apps de la tienda oficial. Nada de banco en Wi-Fi pública.</p></div>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Prevenir</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 07 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 07 / 10 →</p>
 <aside>EXPONE: integrante 3 · TIEMPO: 35 segundos.
 
 GUION: "Como una casa con varias cerraduras: si una falla, quedan otras." Cada flecha → agrega una capa.
@@ -525,7 +535,7 @@ MAYER — Segmentación: una capa por paso. Señalización: número de capa, col
 </div>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Actuar</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 08 / 09 →</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 08 / 10 →</p>
 <aside>EXPONE: integrante 4 · TIEMPO: 45 segundos.
 
 SECUENCIA: cada flecha → agrega una situación (01 a 04). Leé solo el verbo en lima y la acción; la imagen muestra la pantalla que van a ver.
@@ -583,7 +593,7 @@ t();
 <p style="font-size:24px;color:#a9b4bf">Más en <a href="https://www.argentina.gob.ar/justicia/convosenlaweb">argentina.gob.ar/justicia/convosenlaweb</a> · Con vos en la Web, Ministerio de Justicia</p>
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Evaluar y cerrar</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 09 / 09</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 09 / 10</p>
 <aside>EXPONE: integrante 4 · TIEMPO: 1 minuto.
 
 SECUENCIA:
@@ -597,20 +607,75 @@ MAYER — Práctica de recuperación: el grupo aplica lo aprendido a un caso nue
 
 Fuente: Ministerio de Justicia de la Nación, Con vos en la Web — https://www.argentina.gob.ar/justicia/convosenlaweb</aside>
 </section>
+<section id="mayer" data-transition="fade" style="background:radial-gradient(circle at 50% 10%, #15102a 0%, #07090c 58%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(167,139,250,0.05) 0px, rgba(167,139,250,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(62,230,239,0.035) 0px, rgba(62,230,239,0.035) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:8px;background:linear-gradient(90deg, #3ee6ef 0%, #a78bfa 50%, #c6ff4f 100%);box-shadow:0 0 18px #a78bfa"></div>
+<div style="position:absolute;left:128px;top:110px;width:1500px;display:flex;gap:14px;align-items:center">
+<x-icon name="Layers" style="color:#a78bfa;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#a78bfa">// DISEÑO PARA APRENDER</p>
+</div>
+<h2 style="position:absolute;left:128px;top:158px;width:1664px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:68px;font-weight:700;line-height:1.05;text-shadow:0 0 30px rgba(167,139,250,0.32)">Principios de Mayer <span style="color:#c6ff4f">aplicados</span></h2>
+<p style="position:absolute;left:128px;top:246px;width:1500px;font-size:27px;line-height:1.35;color:#a9b4bf">La información se organizó para reducir distracciones, orientar la atención y facilitar decisiones seguras.</p>
+
+<div data-build-in="rise 1 auto" style="position:absolute;left:128px;top:326px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #3ee6ef;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#3ee6ef;margin-bottom:12px">Coherencia</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> cada diapositiva presenta un riesgo o una acción, sin información decorativa innecesaria.</p>
+</div>
+<div data-build-in="rise 1 auto" style="position:absolute;left:548px;top:326px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #ff5f57;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#ff5f57;margin-bottom:12px">Señalización</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> colores, números e íconos destacan señales de alerta y acciones importantes.</p>
+</div>
+<div data-build-in="rise 1 auto" style="position:absolute;left:968px;top:326px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #c6ff4f;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#c6ff4f;margin-bottom:12px">Segmentación</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> las pistas y los pasos de recuperación aparecen progresivamente.</p>
+</div>
+<div data-build-in="rise 1 auto" style="position:absolute;left:1388px;top:326px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #a78bfa;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#a78bfa;margin-bottom:12px">Preentrenamiento</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> primero se explican conceptos como estafa, suplantación y código.</p>
+</div>
+
+<div data-build-in="rise 2 auto" style="position:absolute;left:128px;top:582px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #a78bfa;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:28px;color:#a78bfa;margin-bottom:12px">Contigüidad espacial</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> las explicaciones están junto a la imagen o al elemento señalado.</p>
+</div>
+<div data-build-in="rise 2 auto" style="position:absolute;left:548px;top:582px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #3ee6ef;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#3ee6ef;margin-bottom:12px">Multimedia</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> imágenes de chats, perfiles y pantallas acompañan textos breves.</p>
+</div>
+<div data-build-in="rise 2 auto" style="position:absolute;left:968px;top:582px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #c6ff4f;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#c6ff4f;margin-bottom:12px">Modalidad</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> la pantalla resume; el presentador explica los detalles oralmente.</p>
+</div>
+<div data-build-in="rise 2 auto" style="position:absolute;left:1388px;top:582px;width:382px;height:224px;padding:24px 26px;background:#0e1319;border:1px solid #27313c;border-top:4px solid #ff5f57;border-radius:20px">
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;color:#ff5f57;margin-bottom:12px">Personalización</h3>
+<p style="font-size:22px;line-height:1.35;color:#cbd3da"><b>Ejemplo:</b> preguntas como “¿qué hacés?” y la votación involucran al grupo.</p>
+</div>
+
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Cómo diseñamos para aprender</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 10 / 10</p>
+<aside>EXPONE: integrante 4 · TIEMPO: 1 minuto.
+
+SECUENCIA: la primera fila resume cómo se reduce y organiza la información. La segunda muestra cómo se combinan imágenes, explicación oral y participación.
+
+GUION: “Estos principios no son adornos. Cada uno ayuda a que la atención se concentre en reconocer el riesgo y recordar qué hacer.”
+
+MAYER — Síntesis de los principios aplicados en toda la presentación: coherencia, señalización, segmentación, preentrenamiento, contigüidad espacial, multimedia, modalidad y personalización.</aside>
+</section>
 
 </div>
 </main>
 <nav class="controls" aria-label="Controles de la presentación">
 <div class="group">
 <button class="btn" id="prev" aria-label="Anterior"><span aria-hidden="true">←</span><span class="label">Anterior</span></button>
-<button class="btn" id="notesBtn" aria-expanded="false" aria-controls="notes"><span aria-hidden="true">☰</span><span class="label">Notas</span></button>
+<button class="btn" id="notesBtn" aria-expanded="false" aria-controls="notes" hidden><span aria-hidden="true">☰</span><span class="label">Notas</span></button>
 </div>
 <div class="center">
-<div class="count"><b id="num">1</b> / <span id="tot">9</span> · <span id="ttl"></span></div>
+<div class="count"><b id="num">1</b> / <span id="tot">10</span> · <span id="ttl"></span></div>
 <div class="dots" id="dots"></div>
 </div>
 <div class="group right">
-<button class="btn" id="audioBtn" aria-pressed="false"><span aria-hidden="true">🔊</span><span class="label" id="audioLbl">Escuchar</span></button>
+<button class="btn" id="audioBtn" aria-pressed="false" hidden><span aria-hidden="true">🔊</span><span class="label" id="audioLbl">Escuchar</span></button>
 <button class="btn" id="fsBtn" aria-label="Pantalla completa"><span aria-hidden="true">⛶</span></button>
 <button class="btn primary" id="next" aria-label="Siguiente"><span class="label" id="nextLbl">Siguiente</span><span aria-hidden="true">→</span></button>
 </div>
@@ -709,6 +774,7 @@ function go(i,full){
   [].forEach.call(dots.children,function(d,k){d.classList.toggle('on',k===cur);if(k<=cur)d.classList.add('seen')});
   document.getElementById('prev').disabled=cur===0&&shown===0;
   document.getElementById('nextLbl').textContent=cur===slides.length-1?'Inicio':'Siguiente';
+  var opening=cur===0;nb.hidden=opening;ab.hidden=opening;
   if(!document.getElementById('notes').hidden)fillNotes();
   history.replaceState(null,'','#'+(cur+1));
   if(s.id==='portada')startParticles();
@@ -783,3 +849,7 @@ setTimeout(function(){document.getElementById('hint').classList.add('off')},4500
 </script>
 </body>
 </html>
+
+
+
+
