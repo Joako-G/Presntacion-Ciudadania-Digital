@@ -1,692 +1,785 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07131f">
-  <title>Ciudadanía digital: decisiones que protegen</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --ink: #f5fbff;
-      --muted: #a9bdc9;
-      --bg: #06111b;
-      --surface: #0c1d2a;
-      --cyan: #43e6ef;
-      --coral: #ff6b64;
-      --lime: #c9ff58;
-      --line: rgba(183, 226, 238, .22);
-      --shadow: 0 24px 70px rgba(0, 0, 0, .45);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
-    body { overflow: hidden; }
-    button { font: inherit; }
-    button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--lime); outline-offset: 4px; }
-
-    .app {
-      min-height: 100svh;
-      display: grid;
-      grid-template-rows: 5px 1fr auto;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(67,230,239,.12), transparent 34%),
-        radial-gradient(circle at 90% 85%, rgba(255,107,100,.10), transparent 30%),
-        var(--bg);
-    }
-
-    .progress { background: rgba(255,255,255,.08); overflow: hidden; }
-    .progress span { display: block; width: 12.5%; height: 100%; background: var(--cyan); transition: width .35s ease; }
-
-    .deck { position: relative; min-height: 0; }
-    .slide {
-      display: none;
-      position: absolute;
-      inset: 0;
-      padding: clamp(1.5rem, 4vw, 4.5rem) clamp(1.2rem, 6vw, 7rem);
-      overflow: auto;
-      align-content: center;
-      animation: enter .42s ease both;
-    }
-    .slide.active { display: grid; }
-    @keyframes enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-
-    /* Motion is deliberately brief and tied to information hierarchy, not decoration. */
-    @media (prefers-reduced-motion: no-preference) {
-      .slide.active > :not(.speaker-notes) { animation: content-enter .42s .04s ease both; }
-      .slide.active .hero-grid > *, .slide.active .two-col > * { animation: content-enter .46s ease both; }
-      .slide.active .hero-grid > *:nth-child(2), .slide.active .two-col > *:nth-child(2) { animation-delay: .14s; }
-      .slide.active .concept, .slide.active .step, .slide.active .data-item, .slide.active .recovery > *, .slide.active .quiz-option { animation: content-enter .36s ease both; }
-      .slide.active .concept:nth-child(2), .slide.active .step:nth-child(2), .slide.active .data-item:nth-child(2), .slide.active .recovery > *:nth-child(2), .slide.active .quiz-option:nth-child(2) { animation-delay: .07s; }
-      .slide.active .concept:nth-child(3), .slide.active .step:nth-child(3), .slide.active .data-item:nth-child(3), .slide.active .recovery > *:nth-child(3), .slide.active .quiz-option:nth-child(3) { animation-delay: .14s; }
-      .slide.active .concept:nth-child(4), .slide.active .step:nth-child(4), .slide.active .data-item:nth-child(4), .slide.active .recovery > *:nth-child(4) { animation-delay: .21s; }
-      .slide.active .fake-message { animation: message-emphasis 2.8s .4s ease-in-out 1 both; }
-      .slide.active .signal-word { animation: keyword-underline .52s .48s ease-out both; }
-      .slide.active .signal-word.delayed { animation-delay: .78s; }
-      .slide.active .recovery .action-reveal { animation: action-reveal .32s .16s ease-out both; }
-      .slide.active .recovery > *:nth-child(2) .action-reveal { animation-delay: .23s; }
-      .slide.active .recovery > *:nth-child(3) .action-reveal { animation-delay: .30s; }
-      .slide.active .recovery > *:nth-child(4) .action-reveal { animation-delay: .37s; }
-      .slide.active .demo-stage .big { animation: attention-breathe 2.4s .4s ease-in-out 2 both; }
-      .timer.counting { animation: timer-pulse .7s ease-in-out infinite; }
-      .feedback-pop { animation: feedback-pop .32s ease-out both; }
-      dialog[open] .lock-content { animation: content-enter .3s ease-out both; }
-    }
-    @keyframes content-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes message-emphasis { 0%, 100% { transform: rotate(1.5deg); } 45% { transform: rotate(1.5deg) translateY(-5px); box-shadow: 0 28px 78px rgba(255,107,100,.18); } }
-    @keyframes attention-breathe { 50% { transform: scale(1.035); color: var(--cyan); } }
-    @keyframes timer-pulse { 50% { transform: scale(1.06); color: #ffd5d1; } }
-    @keyframes feedback-pop { from { opacity: .35; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes keyword-underline { from { background-size: 0 100%; color: var(--ink); } to { background-size: 100% 100%; color: #06111b; } }
-    @keyframes action-reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    .eyebrow {
-      margin: 0 0 .8rem;
-      color: var(--cyan);
-      font-size: clamp(.76rem, 1.3vw, .95rem);
-      font-weight: 800;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-    }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 { max-width: 12ch; margin-bottom: 1rem; font-size: clamp(3.2rem, 8vw, 7.5rem); line-height: .9; letter-spacing: -.065em; }
-    h2 { max-width: 18ch; margin-bottom: 1.8rem; font-size: clamp(2.4rem, 5.5vw, 5.2rem); line-height: .95; letter-spacing: -.045em; }
-    h3 { margin-bottom: .55rem; font-size: clamp(1.2rem, 2vw, 1.7rem); }
-    p { color: var(--muted); font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.52; }
-    strong { color: var(--ink); }
-    .signal-word { padding: .03em .18em; border-radius: .18em; background: linear-gradient(var(--lime), var(--lime)) no-repeat 0 50% / 100% 100%; color: #06111b; }
-    .accent { color: var(--lime); }
-    .coral { color: var(--coral); }
-
-    .hero-grid, .two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, .85fr); gap: clamp(2rem, 6vw, 7rem); align-items: center; }
-    .hook {
-      border-left: 3px solid var(--coral);
-      padding-left: 1.1rem;
-      max-width: 32rem;
-    }
-
-    .choices, .actions { display: flex; flex-wrap: wrap; gap: .8rem; }
-    .button {
-      min-height: 3rem;
-      border: 1px solid var(--line);
-      border-radius: .8rem;
-      padding: .82rem 1.15rem;
-      background: rgba(255,255,255,.06);
-      color: var(--ink);
-      cursor: pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
-    }
-    .button:hover { transform: translateY(-2px); border-color: var(--cyan); background: rgba(67,230,239,.10); }
-    .button.primary { border-color: transparent; background: var(--cyan); color: #031317; font-weight: 850; }
-    .button.danger { border-color: rgba(255,107,100,.55); color: #ffd5d1; }
-    .button.ghost { background: transparent; }
-
-    .fake-message {
-      max-width: 29rem;
-      padding: clamp(1.2rem, 3vw, 2rem);
-      border: 1px solid rgba(255,107,100,.4);
-      border-radius: 1.4rem;
-      background: linear-gradient(145deg, rgba(255,107,100,.12), rgba(255,255,255,.03));
-      box-shadow: var(--shadow);
-      transform: rotate(1.5deg);
-    }
-    .fake-message small { color: var(--coral); font-weight: 800; }
-    .fake-message p { margin: .9rem 0; color: var(--ink); }
-    .url { display: block; padding: .8rem; border-radius: .55rem; background: #02080d; color: var(--cyan); overflow-wrap: anywhere; }
-    .answer { min-height: 1.8rem; margin-top: 1rem; color: var(--lime); font-weight: 750; }
-
-    .concepts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-    .concept {
-      min-height: 15rem;
-      padding: 1.35rem;
-      border-top: 4px solid var(--cyan);
-      background: linear-gradient(180deg, rgba(12,29,42,.98), rgba(12,29,42,.5));
-    }
-    .concept:nth-child(2) { border-color: var(--coral); }
-    .concept:nth-child(3) { border-color: var(--lime); }
-    .concept:nth-child(4) { border-color: #a88cff; }
-    .concept .number { display: block; margin-bottom: 2.5rem; color: var(--muted); font-weight: 800; }
-    .concept p { font-size: 1rem; }
-
-    figure { margin: 0; }
-    .visual img { display: block; width: 100%; max-height: 54svh; object-fit: cover; border-radius: 1rem; box-shadow: var(--shadow); }
-    figcaption { margin-top: .7rem; color: var(--muted); font-size: .92rem; line-height: 1.4; }
-
-    .clue-panel { display: grid; gap: .75rem; }
-    .clue {
-      width: 100%;
-      border: 0;
-      border-left: 3px solid var(--line);
-      padding: .85rem 1rem;
-      text-align: left;
-      background: rgba(255,255,255,.03);
-      color: var(--ink);
-      cursor: pointer;
-    }
-    .clue span { display: block; max-height: 0; overflow: hidden; color: var(--muted); opacity: 0; transform: translateY(-4px); transition: max-height .25s ease, margin .25s ease, opacity .2s ease, transform .2s ease; }
-    .clue.open { border-color: var(--lime); background: rgba(201,255,88,.08); }
-    .clue.open span { max-height: 5rem; margin-top: .45rem; opacity: 1; transform: translateY(0); }
-    .counter { color: var(--cyan); font-weight: 800; }
-
-    .demo-stage {
-      display: grid;
-      place-items: center;
-      min-height: 20rem;
-      border: 1px solid var(--line);
-      border-radius: 1.3rem;
-      background: repeating-linear-gradient(135deg, rgba(67,230,239,.035) 0 16px, transparent 16px 32px);
-      text-align: center;
-      padding: 2rem;
-    }
-    .demo-stage .big { margin: 0; color: var(--ink); font-size: clamp(1.8rem, 4vw, 3.6rem); font-weight: 850; }
-    .safety-note { max-width: 48rem; margin-top: 1rem; color: var(--muted); font-size: .95rem; }
-
-    .steps { display: grid; gap: .7rem; counter-reset: step; }
-    .step { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; padding: 1rem 0; border-bottom: 1px solid var(--line); }
-    .step::before { counter-increment: step; content: counter(step, decimal-leading-zero); color: var(--cyan); font-size: 1rem; font-weight: 900; }
-    .step p { margin: .2rem 0 0; font-size: 1rem; }
-
-    .data-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem; margin-top: 1rem; }
-    .data-item { padding: .8rem; border-left: 3px solid var(--coral); background: rgba(255,255,255,.035); }
-
-    .recovery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-    .recovery article, .incident { position: relative; min-height: 14rem; padding: 1.2rem; border: 1px solid var(--line); background: rgba(12,29,42,.72); }
-    .recovery b { display: block; margin-bottom: 3rem; color: var(--coral); }
-    .incident { text-align: left; color: var(--ink); cursor: pointer; }
-    .incident:hover, .incident.selected { border-color: var(--cyan); background: rgba(67,230,239,.10); }
-    .recovery p { font-size: 1rem; }
-
-    .quiz { max-width: 62rem; }
-    .quiz-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
-    .quiz-option { min-height: 7rem; text-align: left; }
-    .quiz-option.correct { border-color: var(--lime); background: rgba(201,255,88,.12); }
-    .quiz-option.incorrect { border-color: var(--coral); background: rgba(255,107,100,.10); }
-    .quiz-feedback { min-height: 3.5rem; margin-top: 1rem; color: var(--ink); font-weight: 700; }
-
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 1rem;
-      padding: .8rem clamp(1rem, 3vw, 2rem);
-      border-top: 1px solid var(--line);
-      background: rgba(4,13,21,.92);
-      backdrop-filter: blur(16px);
-    }
-    .nav { display: flex; gap: .55rem; }
-    .nav:last-child { justify-content: flex-end; }
-    .slide-count { color: var(--muted); font-variant-numeric: tabular-nums; }
-    .icon-button { min-width: 2.8rem; min-height: 2.8rem; padding: .55rem .8rem; }
-
-    .notes-drawer {
-      position: fixed;
-      right: 1rem;
-      bottom: 5rem;
-      z-index: 20;
-      width: min(30rem, calc(100vw - 2rem));
-      max-height: min(70svh, 36rem);
-      overflow: auto;
-      padding: 1.2rem;
-      border: 1px solid var(--line);
-      border-radius: 1rem;
-      background: #0b1a26;
-      box-shadow: var(--shadow);
-    }
-    .notes-drawer[hidden] { display: none; }
-    .notes-drawer h3 { color: var(--cyan); }
-    .notes-drawer p, .notes-drawer li { color: var(--muted); line-height: 1.5; }
-    .speaker-notes { display: none; }
-
-    dialog {
-      width: min(44rem, calc(100vw - 2rem));
-      border: 1px solid rgba(255,107,100,.5);
-      border-radius: 1.2rem;
-      padding: 0;
-      color: var(--ink);
-      background: #08131c;
-      box-shadow: 0 35px 120px rgba(0,0,0,.8);
-    }
-    dialog::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(6px); }
-    .lock-content { padding: clamp(1.5rem, 5vw, 3rem); text-align: center; }
-    .timer { margin: 1rem 0; color: var(--coral); font-size: clamp(4rem, 13vw, 8rem); font-weight: 900; line-height: 1; }
-    .sim-result { color: var(--lime); font-weight: 800; }
-
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-
-    @media (max-width: 880px) {
-      .slide { align-content: start; padding-top: 2.4rem; }
-      .hero-grid, .two-col { grid-template-columns: 1fr; gap: 1.5rem; }
-      .concepts, .recovery { grid-template-columns: repeat(2, 1fr); }
-      .visual img { max-height: 38svh; }
-      .controls { grid-template-columns: auto 1fr auto; }
-      .notes-label { display: none; }
-    }
-    @media (max-width: 560px) {
-      h1 { font-size: clamp(2.8rem, 16vw, 4.5rem); }
-      h2 { font-size: clamp(2.1rem, 11vw, 3.3rem); }
-      .concepts, .recovery, .quiz-options, .data-list { grid-template-columns: 1fr; }
-      .concept, .recovery article, .incident { min-height: auto; }
-      .concept .number, .recovery b { margin-bottom: 1rem; }
-      .button { padding: .72rem .9rem; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07090c">
+<meta name="description" content="Presentación interactiva sobre ciudadanía digital: estafas, suplantación, códigos de verificación y enlaces sospechosos.">
+<title>Ciudadanía digital: decisiones que protegen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Rubik:wght@400;500;600;700;800&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#07090c;color:#f4f7fa;font-family:'Rubik',Arial,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #c6ff4f;outline-offset:3px}
+.progress{position:fixed;left:0;top:0;right:0;height:6px;background:#141a21;z-index:5}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#3ee6ef,#a78bfa,#c6ff4f);box-shadow:0 0 14px #3ee6ef;transition:width .4s ease}
+#viewport{position:fixed;left:0;right:0;top:6px;bottom:96px;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0}
+#stage>section{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+#stage>section.active{opacity:1;visibility:visible;transition:opacity .45s ease}
+section aside{display:none}
+section img{display:block}
+section ul,section ol{padding-left:1.2em}
+a{color:#3ee6ef}
+.ico{display:inline-block;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.embed{border:0;display:block;background:transparent}
+.bi{opacity:0;transition:opacity .45s ease,translate .45s cubic-bezier(.2,.8,.2,1),scale .4s cubic-bezier(.3,1.4,.5,1)}
+.bi.rise{translate:0 28px}
+.bi.pop{scale:.6}
+.bi.on{opacity:1;translate:0 0;scale:1}
+.bi:not(.on){pointer-events:none}
+.shape{pointer-events:none}
+[data-reveal]{cursor:pointer}
+[data-reveal]:hover{border-color:#3ee6ef !important;box-shadow:0 0 24px rgba(62,230,239,.25)}
+.particles{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+.controls{position:fixed;left:0;right:0;bottom:0;height:96px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:0 24px;background:rgba(9,12,16,.96);border-top:1px solid #1d252e;z-index:5}
+.group{display:flex;gap:10px;align-items:center}
+.group.right{justify-content:flex-end}
+.btn{min-height:56px;min-width:56px;padding:0 22px;border-radius:14px;border:1px solid #2a3440;background:#10161d;font-size:19px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .15s,border-color .15s,transform .15s}
+.btn:hover{border-color:#3ee6ef;background:#0f1d22}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.primary{background:#3ee6ef;border-color:#3ee6ef;color:#031317;font-weight:800}
+.btn.primary:hover{background:#6ff0f5}
+.btn[aria-pressed="true"]{border-color:#c6ff4f;color:#c6ff4f}
+.center{display:flex;flex-direction:column;align-items:center;gap:8px}
+.count{font-family:'JetBrains Mono','Courier New',monospace;font-size:17px;color:#a9b4bf;white-space:nowrap}
+.count b{color:#f4f7fa}
+.dots{display:flex;gap:8px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid #3a4552;background:transparent;cursor:pointer;padding:0}
+.dot.on{background:#3ee6ef;border-color:#3ee6ef;box-shadow:0 0 10px #3ee6ef}
+.dot.seen{border-color:#3ee6ef}
+.notes{position:fixed;right:20px;bottom:112px;width:min(560px,calc(100vw - 40px));max-height:min(64vh,620px);overflow:auto;padding:22px 24px;border:1px solid #2a3440;border-radius:18px;background:#0c1117;box-shadow:0 30px 80px rgba(0,0,0,.6);z-index:6;font-size:17px;line-height:1.55;color:#c9d2db;white-space:pre-wrap}
+.notes h3{font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.12em;color:#3ee6ef;margin-bottom:10px;white-space:normal}
+.notes[hidden]{display:none}
+.hint{position:fixed;left:50%;top:22px;translate:-50% 0;padding:10px 18px;border-radius:999px;background:rgba(16,22,29,.92);border:1px solid #2a3440;font-family:'JetBrains Mono',monospace;font-size:15px;color:#a9b4bf;z-index:6;transition:opacity .6s}
+.hint.off{opacity:0;pointer-events:none}
+@media (max-width:900px){
+ .controls{height:auto;padding:10px 12px;grid-template-columns:auto 1fr auto;row-gap:8px}
+ .btn{padding:0 14px;font-size:16px}
+ .label{display:none}
+ #viewport{bottom:110px}
+ .dots{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
-    <main class="deck" id="deck" aria-live="polite">
-      <section class="slide active" data-title="Decisión" aria-labelledby="s1-title">
-        <div class="hero-grid">
-          <div>
-            <p class="eyebrow">Ciudadanía digital</p>
-            <h1 id="s1-title">Una pausa puede proteger tu cuenta</h1>
-            <p class="hook">Recibes un mensaje: “Mamá, cambié de número. Es <span class="signal-word">urgente</span>. Envíame el <span class="signal-word delayed">código</span> que acaba de llegarte”. Tienes cinco segundos para decidir.</p>
-            <div class="choices" aria-label="Decisión inicial">
-              <button class="button danger" data-hook-answer="click">Enviar el código</button>
-              <button class="button primary" data-hook-answer="check">Llamar al número anterior</button>
-            </div>
-            <div class="answer" id="hookAnswer" role="status"></div>
-          </div>
-          <article class="fake-message" aria-label="Ejemplo ficticio de mensaje sospechoso">
-            <small>MENSAJE FICTICIO</small>
-            <p><strong>Hola, mamá. Cambié de número.</strong><br>Necesito el <span class="signal-word">código</span> que te llegó. Es <span class="signal-word delayed">urgente</span>.</p>
-            <code class="url">Contacto nuevo · mensaje ficticio</code>
-          </article>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Pida una decisión rápida y escuche dos o tres respuestas. No confirme todavía cuál es correcta: la tensión abre la pregunta central.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Coherencia:</strong> solo aparece la información necesaria. <strong>Señalización:</strong> el color coral marca la urgencia sospechosa. <strong>Personalización:</strong> el planteo conversa directamente con el grupo.</p>
-        </aside>
-      </section>
+<div class="progress" aria-hidden="true"><span id="bar"></span></div>
+<div class="hint" id="hint">Usá ← → del teclado o los botones de abajo</div>
+<main id="viewport" aria-live="polite">
+<div id="stage">
+<section id="portada" data-transition="fade" style="background:#07090c;color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px;display:flex;flex-direction:column">
+<img src="assets/digital-footprint-data-theft.png" alt="Una estudiante mira su celular mientras sus datos viajan hacia una figura encapuchada" style="position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:linear-gradient(0deg, #07090c 0%, #07090c 24%, rgba(7,9,12,0.45) 46%, rgba(7,9,12,0) 66%)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<canvas class="particles" aria-hidden="true"></canvas>
+<div style="position:absolute;left:0;top:0;width:213px;height:8px;background:#3ee6ef;box-shadow:0 0 18px #3ee6ef"></div>
+<div data-build-in="fade 1 auto" style="position:absolute;left:128px;top:686px;width:1200px;display:flex;gap:16px;align-items:center">
+<x-icon name="Lock" style="color:#3ee6ef;width:40px;height:40px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#3ee6ef">// Ciudadanía digital</p>
+</div>
+<h1 data-build-in="rise 2 auto" style="position:absolute;left:128px;top:736px;width:1664px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:84px;font-weight:700;line-height:1.05;letter-spacing:-1px;white-space:nowrap;text-shadow:0 0 30px rgba(62,230,239,0.35)">Una pausa puede <span style="color:#c6ff4f">proteger tu cuenta</span></h1>
+<div data-build-in="rise 3 auto" style="position:absolute;left:128px;top:866px;width:1664px;display:flex;gap:20px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#a9b4bf">← → para avanzar y volver</p>
+<div style="flex:1"></div>
+<div style="display:flex;gap:12px;align-items:center;padding:12px 24px;border:2px solid #3ee6ef;border-radius:999px;box-shadow:0 0 20px rgba(62,230,239,0.35)"><x-icon name="Clock" style="color:#3ee6ef;width:32px;height:32px"></x-icon><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;font-weight:700">Pausá</p></div>
+<div style="display:flex;gap:12px;align-items:center;padding:12px 24px;border:2px solid #a78bfa;border-radius:999px;box-shadow:0 0 20px rgba(167,139,250,0.35)"><x-icon name="Search" style="color:#a78bfa;width:32px;height:32px"></x-icon><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;font-weight:700">Verificá</p></div>
+<div style="display:flex;gap:12px;align-items:center;padding:12px 24px;border:2px solid #c6ff4f;border-radius:999px;box-shadow:0 0 20px rgba(198,255,79,0.35)"><x-icon name="CheckCircle" style="color:#c6ff4f;width:32px;height:32px"></x-icon><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;font-weight:700">Actuá</p></div>
+</div>
+<x-shape kind="ellipse" data-build-in="pop 4 auto" style="position:absolute;left:266px;top:504px;width:130px;height:130px;background:transparent;border:3px solid #3ee6ef;box-shadow:0 0 30px #3ee6ef"></x-shape>
+<div data-build-in="pop 5 auto" style="position:absolute;left:422px;top:484px;width:22px;height:22px;background:#3ee6ef;border-radius:4px;box-shadow:0 0 18px #3ee6ef"></div>
+<div data-build-in="pop 6 auto" style="position:absolute;left:550px;top:404px;width:18px;height:18px;background:#ff5f57;border-radius:4px;box-shadow:0 0 18px #ff5f57"></div>
+<div data-build-in="pop 7 auto" style="position:absolute;left:678px;top:376px;width:26px;height:26px;background:#3ee6ef;border-radius:4px;box-shadow:0 0 18px #3ee6ef"></div>
+<div data-build-in="pop 8 auto" style="position:absolute;left:810px;top:312px;width:20px;height:20px;background:#a78bfa;border-radius:4px;box-shadow:0 0 18px #a78bfa"></div>
+<div data-build-in="pop 9 auto" style="position:absolute;left:942px;top:306px;width:24px;height:24px;background:#3ee6ef;border-radius:4px;box-shadow:0 0 18px #3ee6ef"></div>
+<div data-build-in="pop 10 auto" style="position:absolute;left:1076px;top:268px;width:18px;height:18px;background:#ff5f57;border-radius:4px;box-shadow:0 0 18px #ff5f57"></div>
+<div data-build-in="pop 11 auto" style="position:absolute;left:1210px;top:292px;width:26px;height:26px;background:#3ee6ef;border-radius:4px;box-shadow:0 0 18px #3ee6ef"></div>
+<div data-build-in="pop 12 auto" style="position:absolute;left:1346px;top:290px;width:20px;height:20px;background:#a78bfa;border-radius:4px;box-shadow:0 0 18px #a78bfa"></div>
+<div data-build-in="pop 13 auto" style="position:absolute;left:1484px;top:332px;width:22px;height:22px;background:#ff5f57;border-radius:4px;box-shadow:0 0 18px #ff5f57"></div>
+<aside>EXPONE: integrante 1 · TIEMPO: 15 segundos.
 
-      <section class="slide" data-title="Conceptos" aria-labelledby="s2-title">
-        <div>
-          <p class="eyebrow">Antes de analizar</p>
-          <h2 id="s2-title">Cuatro ideas para decidir con seguridad</h2>
-          <div class="concepts">
-            <article class="concept"><span class="number">01</span><h3>Estafa</h3><p>Un engaño que busca dinero, datos o acceso.</p></article>
-            <article class="concept"><span class="number">02</span><h3>Suplantación</h3><p>Alguien se hace pasar por una persona u organización.</p></article>
-            <article class="concept"><span class="number">03</span><h3>Código de verificación</h3><p>Una llave temporal que nunca se comparte.</p></article>
-            <article class="concept"><span class="number">04</span><h3>Enlace sospechoso</h3><p>Un destino que debe revisarse antes de abrirlo.</p></article>
-          </div>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Defina cada término en una frase y pida un ejemplo cotidiano. Evite leer las tarjetas palabra por palabra.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Preentrenamiento:</strong> los conceptos aparecen antes de usarlos. <strong>Segmentación:</strong> cada tarjeta contiene una sola idea.</p>
-        </aside>
-      </section>
+MOVIMIENTO (en modo Presentar): entran el título y las palabras clave; después se ilumina el celular y los datos "viajan" hacia la figura encapuchada.
 
-      <section class="slide" data-title="Phishing" aria-labelledby="s3-title">
-        <div class="two-col">
-          <figure class="visual">
-            <img src="assets/phishing-link-hesitation.png" alt="Una persona duda antes de tocar un enlace sospechoso en su teléfono">
-            <figcaption>La pausa antes de tocar permite revisar el remitente, el destino y el tono del mensaje.</figcaption>
-          </figure>
-          <div>
-            <p class="eyebrow">Actividad 1</p>
-            <h2 id="s3-title">Seis señales de un posible engaño</h2>
-            <p>Abra cada señal y explique por qué cambia la decisión.</p>
-            <div class="clue-panel">
-              <button class="clue" aria-expanded="false"><strong>Urgencia o amenaza</strong><span>Busca que reaccione antes de verificar.</span></button>
-              <button class="clue" aria-expanded="false"><strong>Premio inesperado</strong><span>Un beneficio improbable puede ser el anzuelo.</span></button>
-              <button class="clue" aria-expanded="false"><strong>Pedido de datos o códigos</strong><span>Las claves y códigos de verificación no se comparten.</span></button>
-              <button class="clue" aria-expanded="false"><strong>Enlace o archivo</strong><span>Conviene revisar el destino y evitar descargas no solicitadas.</span></button>
-              <button class="clue" aria-expanded="false"><strong>Identidad dudosa</strong><span>Una foto o un nombre conocido se pueden copiar.</span></button>
-              <button class="clue" aria-expanded="false"><strong>Detalles inconsistentes</strong><span>Errores, cambios de tono o datos que no coinciden son señales.</span></button>
-            </div>
-            <p class="counter" id="clueCount">0 de 6 señales abiertas</p>
-          </div>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Revele una señal por vez. Pregunte qué verificarían antes de tocar el enlace y destaque que un diseño convincente no demuestra autenticidad.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Contigüidad espacial:</strong> la leyenda queda junto a la imagen. <strong>Señalización:</strong> las pistas cambian de estado. <strong>Segmentación:</strong> la explicación se revela a demanda.</p>
-        </aside>
-      </section>
+NAVEGACIÓN: en Presentar, flecha → avanza (también revela las pistas de a una) y flecha ← vuelve.
 
-      <section class="slide" data-title="Simulación" aria-labelledby="s4-title">
-        <div class="two-col">
-          <div>
-            <p class="eyebrow">Demostración segura</p>
-            <h2 id="s4-title">¿Qué se siente al perder el control?</h2>
-            <p>La simulación desactiva únicamente esta presentación durante cinco segundos. No captura datos ni bloquea el navegador.</p>
-            <button class="button danger" id="startSimulation">Abrir enlace ficticio</button>
-            <p class="safety-note">Todo ocurre dentro de esta diapositiva. No bloquea el navegador, no descarga archivos y no usa internet.</p>
-          </div>
-          <div class="demo-stage" aria-hidden="true">
-            <div><p class="big">5 segundos</p><p>para sentir cómo una interfaz intenta quitar el control</p></div>
-          </div>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Antes de iniciar, aclare que es una simulación. Después pregunte qué señales generaron presión y qué salida segura deberían buscar.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Contigüidad temporal:</strong> la explicación sucede inmediatamente después de la experiencia. <strong>Coherencia:</strong> la interacción demuestra un único riesgo.</p>
-        </aside>
-      </section>
+GUION: "¿A quién le llegó alguna vez un mensaje raro pidiendo un código o plata? Hoy vamos a aprender a frenar a tiempo con una regla: Pausá, Verificá, Actuá."
 
-      <section class="slide" data-title="Cuentas" aria-labelledby="s5-title">
-        <div class="two-col">
-          <div>
-            <p class="eyebrow">Capas de protección</p>
-            <h2 id="s5-title">Una cuenta segura no depende de una sola barrera</h2>
-            <p>La meta no es recordar una contraseña imposible. Es reducir el daño si una capa falla.</p>
-          </div>
-          <div class="steps">
-            <article class="step"><div><h3>Frase de contraseña única</h3><p>Use una combinación larga y distinta para cada servicio. Un gestor puede recordarla.</p></div></article>
-            <article class="step"><div><h3>Segundo factor</h3><p>Active una aplicación autenticadora o el método más fuerte disponible.</p></div></article>
-            <article class="step"><div><h3>Sesiones bajo control</h3><p>Revise los dispositivos conectados y cierre los que no reconozca.</p></div></article>
-            <article class="step"><div><h3>Descargas y redes</h3><p>Instale desde fuentes oficiales y evite operaciones sensibles en redes públicas que no pueda verificar.</p></div></article>
-          </div>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Use la analogía de capas: si una puerta falla, todavía quedan otras. No pida contraseñas reales al grupo.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Modalidad:</strong> la pantalla muestra palabras clave mientras la explicación oral aporta el detalle. <strong>Redundancia:</strong> se evita un párrafo que replique toda la narración.</p>
-        </aside>
-      </section>
+MAYER — Imagen: una escena que anticipa el riesgo, no la cara del presentador. Señalización: las tres palabras clave con color e ícono propios vuelven en el cierre. Personalización: "tu cuenta".</aside>
+</section>
 
-      <section class="slide" data-title="Redes sociales" aria-labelledby="s6-title">
-        <div class="two-col">
-          <div>
-            <p class="eyebrow">Redes sociales</p>
-            <h2 id="s6-title">WhatsApp y redes sociales también exigen verificar</h2>
-            <div class="data-list" aria-label="Datos que puede revelar una publicación">
-              <div class="data-item"><strong>“Cambié de número”</strong><br><span>confirme por el contacto anterior</span></div>
-              <div class="data-item"><strong>Perfil falso</strong><br><span>una foto no prueba identidad</span></div>
-              <div class="data-item"><strong>Promoción increíble</strong><br><span>revise la cuenta y el sitio oficial</span></div>
-              <div class="data-item"><strong>Noticia impactante</strong><br><span>compare antes de compartir</span></div>
-            </div>
-          </div>
-          <figure class="visual">
-            <img src="assets/digital-footprint-data-theft.png" alt="Datos luminosos salen del teléfono de un estudiante hacia una figura distante">
-            <figcaption>Una identidad visual se puede copiar. La verificación debe ocurrir por otro canal.</figcaption>
-          </figure>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Pida que observen la imagen y comparen las cuatro situaciones. Destaque que verificar por otro canal protege frente a la suplantación.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Multimedia:</strong> palabras e imagen construyen juntas la idea. <strong>Contigüidad espacial:</strong> la leyenda explica la imagen sin separarlas. <strong>Coherencia:</strong> no hay elementos decorativos ajenos al riesgo.</p>
-        </aside>
-      </section>
+<section id="ciudadania" data-transition="fade" style="background:radial-gradient(circle at 15% 85%, #0c1a20 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:426px;height:8px;background:#3ee6ef;box-shadow:0 0 18px #3ee6ef"></div>
+<div style="position:absolute;left:128px;top:128px;width:1200px;display:flex;gap:14px;align-items:center">
+<x-icon name="Globe" style="color:#3ee6ef;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#3ee6ef">// Punto de partida</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:1664px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;text-shadow:0 0 30px rgba(62,230,239,0.35)">Ciudadanía digital responsable</h2>
+<p style="position:absolute;left:128px;top:300px;width:720px;font-size:38px;font-weight:700;line-height:1.25">Internet es como una ciudad.</p>
+<p style="position:absolute;left:128px;top:356px;width:720px;font-size:30px;line-height:1.4;color:#a9b4bf">Un espacio público donde tenemos derechos y responsabilidades… y también riesgos.</p>
+<div style="position:absolute;left:128px;top:480px;width:720px;display:flex;flex-direction:column;gap:6px;padding:32px 40px;background:#0b1418;border:1px solid #1f4549;border-radius:24px;box-shadow:0 0 60px rgba(62,230,239,0.12)">
+<p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:128px;font-weight:700;line-height:1.0;color:#3ee6ef;text-shadow:0 0 40px rgba(62,230,239,0.6)">5–6 h</p>
+<p style="font-size:30px;line-height:1.35">por día pasamos frente a pantallas.</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Fuente: UNICEF</p>
+</div>
+<div data-build-in="rise 1" style="position:absolute;left:912px;top:300px;width:424px;display:flex;flex-direction:column;gap:22px;padding:32px;background:#0e1319;border:1px solid #27313c;border-radius:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:3px;color:#3ee6ef">DERECHOS</p>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Search" style="color:#3ee6ef;width:40px;height:40px"></x-icon><p style="font-size:30px">Informarte</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Chat" style="color:#3ee6ef;width:40px;height:40px"></x-icon><p style="font-size:30px">Comunicarte</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="GraduationCap" style="color:#3ee6ef;width:40px;height:40px"></x-icon><p style="font-size:30px">Aprender y jugar</p></div>
+</div>
+<div data-build-in="rise 2" style="position:absolute;left:1368px;top:300px;width:424px;display:flex;flex-direction:column;gap:22px;padding:32px;background:#0e1319;border:1px solid #27313c;border-radius:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:3px;color:#c6ff4f">RESPONSABILIDADES</p>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Lock" style="color:#c6ff4f;width:40px;height:40px"></x-icon><p style="font-size:30px">Cuidar tus datos</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Verified" style="color:#c6ff4f;width:40px;height:40px"></x-icon><p style="font-size:30px">Verificar antes</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Users" style="color:#c6ff4f;width:40px;height:40px"></x-icon><p style="font-size:30px">Respetar a otros</p></div>
+</div>
+<div data-build-in="rise 3" style="position:absolute;left:128px;top:812px;width:1664px;display:flex;gap:16px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:3px;color:#a9b4bf">HOY VEMOS →</p>
+<div style="flex:1;display:flex;gap:12px;align-items:center;padding:14px 20px;border:1px solid #1f4549;border-radius:14px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#3ee6ef">01</p><p style="font-size:28px;font-weight:600">Estafa</p></div>
+<div style="flex:1;display:flex;gap:12px;align-items:center;padding:14px 20px;border:1px solid #5a2b29;border-radius:14px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">02</p><p style="font-size:28px;font-weight:600">Suplantación</p></div>
+<div style="flex:1;display:flex;gap:12px;align-items:center;padding:14px 20px;border:1px solid #4b5e22;border-radius:14px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#c6ff4f">03</p><p style="font-size:28px;font-weight:600">Código</p></div>
+<div style="flex:1;display:flex;gap:12px;align-items:center;padding:14px 20px;border:1px solid #3b3366;border-radius:14px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#a78bfa">04</p><p style="font-size:28px;font-weight:600">Enlace</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Punto de partida</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 02 / 09 →</p>
+<aside>EXPONE: integrante 1 · TIEMPO: 35 segundos.
 
-      <section class="slide" data-title="Recuperación" aria-labelledby="s7-title">
-        <div>
-          <p class="eyebrow">Si ya hizo clic</p>
-          <h2 id="s7-title">La respuesta depende de lo que ocurrió</h2>
-          <p>Seleccione una situación para ver el primer plan de acción.</p>
-          <div class="recovery" role="group" aria-label="Situaciones de recuperación">
-            <button class="button incident" data-incident="link"><b>01</b><strong class="action-reveal">Solo abrí el enlace</strong></button>
-            <button class="button incident" data-incident="password"><b>02</b><strong class="action-reveal">Ingresé mi contraseña</strong></button>
-            <button class="button incident" data-incident="bank"><b>03</b><strong class="action-reveal">Entregué datos bancarios</strong></button>
-            <button class="button incident" data-incident="account"><b>04</b><strong class="action-reveal">Perdí acceso a la cuenta</strong></button>
-          </div>
-          <p class="hook" id="recoveryAdvice" role="status">Primero identifique qué información o acceso pudo quedar expuesto.</p>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Normalice pedir ayuda. La vergüenza demora la respuesta y aumenta el daño. Distinga entre abrir un enlace, entregar credenciales e instalar un archivo.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Segmentación:</strong> la recuperación se divide en cuatro acciones. <strong>Señalización:</strong> la numeración hace visible el orden.</p>
-        </aside>
-      </section>
+GUION: "Internet es como una ciudad: un espacio público donde tenemos derechos y responsabilidades, pero también riesgos que hay que saber detectar. Según UNICEF, pasamos entre cinco y seis horas por día frente a pantallas."
+Clic 1: derechos (informarnos, comunicarnos, aprender y jugar).
+Clic 2: responsabilidades (cuidar nuestros datos, verificar antes de compartir, respetar a otros).
+Clic 3: el mapa de hoy, cuatro conceptos. "Para cada uno vamos a ver primero qué es y después un problema real."
 
-      <section class="slide" data-title="Desafío" aria-labelledby="s8-title">
-        <div class="quiz">
-          <p class="eyebrow">Desafío final</p>
-          <h2 id="s8-title">Te llega un enlace de un amigo. ¿Qué dato cambia tu decisión?</h2>
-          <div class="quiz-options" role="group" aria-label="Opciones del desafío">
-            <button class="button quiz-option" data-quiz="wrong">Tiene su foto de perfil</button>
-            <button class="button quiz-option" data-quiz="right">Confirmó por otro canal que realmente lo envió</button>
-            <button class="button quiz-option" data-quiz="wrong">El mensaje dice que es urgente</button>
-          </div>
-          <p class="quiz-feedback" id="quizFeedback" role="status">Elija una respuesta y explique su razonamiento.</p>
-          <p class="hook"><strong>Regla para recordar:</strong> haga una pausa, verifique por otro canal y actúe desde el sitio o la aplicación oficial.</p>
-        </div>
-        <aside class="speaker-notes">
-          <h3>Guion sugerido</h3>
-          <p>Pida que justifiquen la elección. Cierre con una regla personal formulada por el grupo, no con una lista nueva de consejos.</p>
-          <h3>Principios de Mayer</h3>
-          <p><strong>Práctica de recuperación:</strong> el grupo aplica lo aprendido. <strong>Personalización:</strong> la decisión se plantea en segunda persona. <strong>Segmentación:</strong> una sola situación concentra el cierre.</p>
-        </aside>
-      </section>
-    </main>
+FUENTE: material de la cátedra; la cifra de pantallas corresponde a declaraciones de la directora ejecutiva de UNICEF, Henrietta Fore.
 
-    <footer class="controls" aria-label="Controles de la presentación">
-      <div class="nav">
-        <button class="button icon-button" id="prevBtn" aria-label="Diapositiva anterior">←</button>
-        <button class="button icon-button" id="notesBtn" aria-expanded="false" aria-controls="notesDrawer"><span aria-hidden="true">☰</span><span class="notes-label"> Notas</span></button>
-      </div>
-      <div class="slide-count"><span id="currentNumber">1</span> / 8 · <span id="currentTitle">Un clic</span></div>
-      <div class="nav">
-        <button class="button icon-button" id="fullscreenBtn" aria-label="Pantalla completa">⛶</button>
-        <button class="button ghost" id="audioBtn" aria-pressed="false"><span aria-hidden="true">🔊</span><span class="audio-label"> Escuchar</span></button>
-        <button class="button primary" id="nextBtn">Siguiente</button>
-      </div>
-    </footer>
-  </div>
+MAYER — Preentrenamiento: se presenta el marco y el mapa de conceptos antes de los casos. Segmentación: derechos, responsabilidades y agenda aparecen de a uno. Señalización: cada concepto de la agenda conserva su color en el resto de la presentación.</aside>
+</section>
 
-  <aside class="notes-drawer" id="notesDrawer" hidden aria-live="polite"></aside>
+<section id="estafa" data-transition="fade" style="background:radial-gradient(circle at 75% 20%, #0c1a20 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:639px;height:8px;background:#3ee6ef;box-shadow:0 0 18px #3ee6ef"></div>
+<div style="position:absolute;left:128px;top:128px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Warning" style="color:#3ee6ef;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#3ee6ef">// CONCEPTO 01</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:780px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;color:#3ee6ef;text-shadow:0 0 30px rgba(62,230,239,0.5)">Estafa</h2>
+<p style="position:absolute;left:128px;top:284px;width:780px;font-size:32px;line-height:1.35;color:#c9d2db">Un engaño que busca tu dinero, tus datos o tu cuenta.</p>
+<div style="position:absolute;left:128px;top:404px;width:780px;height:2px;background:linear-gradient(90deg, #3ee6ef 0%, rgba(62,230,239,0) 100%)"></div>
+<div data-build-in="fade 1" style="position:absolute;left:128px;top:432px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Search" style="color:#ff5f57;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#ff5f57">// EL PROBLEMA · CASO REAL</p>
+</div>
+<p data-build-in="fade 1" style="position:absolute;left:128px;top:484px;width:780px;font-size:36px;font-weight:700;line-height:1.2">¿Le harías caso a esta página?</p>
+<img data-build-in="fade 1" src="assets/caso-premio.jpg" alt="Captura real: Enhorabuena, has ganado un iPhone 13; pide pulsar OK y pagar el envío" style="position:absolute;left:1122px;top:128px;width:547px;height:792px;object-fit:cover;border:6px solid #1d232b;border-radius:28px;box-shadow:0 0 80px rgba(62,230,239,0.15)">
+<x-shape kind="ellipse" data-build-in="pop 2" style="position:absolute;left:1198px;top:162px;width:138px;height:50px;background:transparent;border:4px solid #ff5f57;box-shadow:0 0 16px #ff5f57"></x-shape>
+<x-connector x1="908" y1="604" x2="1198" y2="190" head="end" data-build-in="fade 2" style="color:#ff5f57;border-width:3px"></x-connector>
+<div data-build-in="rise 2" style="position:absolute;left:128px;top:568px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">1</p></div>
+<p style="flex:1;font-size:28px">Dirección desconocida: clic-ee.website</p>
+</div>
+<x-shape kind="ellipse" data-build-in="pop 3" style="position:absolute;left:1215px;top:446px;width:360px;height:104px;background:transparent;border:4px solid #ff5f57;box-shadow:0 0 16px #ff5f57"></x-shape>
+<x-connector x1="908" y1="692" x2="1215" y2="510" head="end" data-build-in="fade 3" style="color:#ff5f57;border-width:3px"></x-connector>
+<div data-build-in="rise 3" style="position:absolute;left:128px;top:656px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">2</p></div>
+<p style="flex:1;font-size:28px">Un premio que nunca pediste</p>
+</div>
+<x-shape kind="ellipse" data-build-in="pop 4" style="position:absolute;left:1166px;top:676px;width:460px;height:74px;background:transparent;border:4px solid #ff5f57;box-shadow:0 0 16px #ff5f57"></x-shape>
+<x-connector x1="908" y1="780" x2="1166" y2="722" head="end" data-build-in="fade 4" style="color:#ff5f57;border-width:3px"></x-connector>
+<div data-build-in="rise 4" style="position:absolute;left:128px;top:744px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">3</p></div>
+<p style="flex:1;font-size:28px">“Gratis”, pero tenés que pagar el envío</p>
+</div>
+<x-shape kind="ellipse" data-build-in="pop 5" style="position:absolute;left:1320px;top:826px;width:152px;height:88px;background:transparent;border:4px solid #ff5f57;box-shadow:0 0 16px #ff5f57"></x-shape>
+<x-connector x1="908" y1="868" x2="1320" y2="868" head="end" data-build-in="fade 5" style="color:#ff5f57;border-width:3px"></x-connector>
+<div data-build-in="rise 5" style="position:absolute;left:128px;top:832px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">4</p></div>
+<p style="flex:1;font-size:28px">Un solo botón que te apura</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 03 / 09 →</p>
+<aside>EXPONE: integrante 1 · TIEMPO: 45 segundos.
 
-  <dialog id="simulationDialog" aria-labelledby="simulationTitle">
-    <div class="lock-content">
-      <p class="eyebrow">Simulación educativa</p>
-      <h2 id="simulationTitle">Tu sesión fue comprometida</h2>
-      <div class="timer" id="timer" aria-live="polite">5</div>
-      <p id="simulationMessage">Detectamos actividad inusual. No cierre esta ventana.</p>
-    </div>
-  </dialog>
+SECUENCIA (cada flecha → es un paso):
+0. Solo se ve el CONCEPTO: "Una estafa es un engaño que busca tu dinero, tus datos o tu cuenta."
+1. Aparece EL PROBLEMA, una captura real. "¿Tocarían OK?" (3 segundos de silencio).
+2 a 5. Pistas de a una, cada una con su círculo sobre la imagen: dirección rara, premio que no pediste, pagar el "envío" (la excusa para pedir la tarjeta), un botón que apura.
+Cierre: "Nadie regala un celular por entrar a una página."
 
-  <script>
-    (() => {
-      const slides = [...document.querySelectorAll('.slide')];
-      const progressBar = document.getElementById('progressBar');
-      const currentNumber = document.getElementById('currentNumber');
-      const currentTitle = document.getElementById('currentTitle');
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const notesBtn = document.getElementById('notesBtn');
-      const notesDrawer = document.getElementById('notesDrawer');
-      const audioBtn = document.getElementById('audioBtn');
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let current = 0;
+MAYER — Preentrenamiento: primero el concepto, después el caso. Señalización: círculos y flechas sobre la imagen. Contigüidad espacial: cada pista unida a su parte de la imagen. Segmentación: una pista por paso.</aside>
+</section>
 
-      function replayFeedback(element) {
-        if (reducedMotion) return;
-        element.classList.remove('feedback-pop');
-        void element.offsetWidth;
-        element.classList.add('feedback-pop');
-      }
+<section id="suplantacion" data-transition="fade" style="background:radial-gradient(circle at 75% 20%, #1c0f12 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(255,95,87,0.045) 0px, rgba(255,95,87,0.045) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(255,95,87,0.045) 0px, rgba(255,95,87,0.045) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:852px;height:8px;background:#ff5f57;box-shadow:0 0 18px #ff5f57"></div>
+<div style="position:absolute;left:128px;top:128px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Users" style="color:#ff5f57;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#ff5f57">// CONCEPTO 02</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:780px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;color:#ff5f57;text-shadow:0 0 30px rgba(255,95,87,0.5)">Suplantación</h2>
+<p style="position:absolute;left:128px;top:284px;width:780px;font-size:32px;line-height:1.35;color:#c9d2db">Alguien se hace pasar por una persona, un banco o una empresa.</p>
+<div style="position:absolute;left:128px;top:404px;width:780px;height:2px;background:linear-gradient(90deg, #ff5f57 0%, rgba(255,95,87,0) 100%)"></div>
+<div data-build-in="fade 1" style="position:absolute;left:128px;top:432px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Search" style="color:#ff5f57;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#ff5f57">// EL PROBLEMA</p>
+</div>
+<p data-build-in="fade 1" style="position:absolute;left:128px;top:484px;width:780px;font-size:36px;font-weight:700;line-height:1.2">Misma foto y nombre: ¿cuál es real?</p>
+<div data-build-in="rise 1" style="position:absolute;left:1000px;top:128px;width:792px;display:flex;flex-direction:column;gap:18px;padding:28px;background:#0e1319;border:1px solid #27313c;border-radius:24px">
+<div style="display:flex;gap:20px;align-items:center">
+<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg, #3ee6ef 0%, #a78bfa 100%)"><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:36px;font-weight:700;color:#07090c">S</p></div>
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">PERFIL A</p><p style="font-size:36px;font-weight:700">@sofi.quispe</p></div>
+</div>
+<div style="display:flex;gap:12px">
+<div style="display:flex;gap:10px;align-items:center;padding:10px 16px;background:#151b22;border-radius:12px"><x-icon name="Users" style="color:#a9b4bf;width:28px;height:28px"></x-icon><p style="font-size:24px">1.240 seguidores</p></div>
+<div style="display:flex;gap:10px;align-items:center;padding:10px 16px;background:#151b22;border-radius:12px"><x-icon name="Clock" style="color:#a9b4bf;width:28px;height:28px"></x-icon><p style="font-size:24px">6 años</p></div>
+<div style="display:flex;gap:10px;align-items:center;padding:10px 16px;background:#151b22;border-radius:12px"><x-icon name="Chat" style="color:#a9b4bf;width:28px;height:28px"></x-icon><p style="font-size:24px">Ya hablaron</p></div>
+</div>
+<p style="font-size:26px;line-height:1.35;padding:14px 18px;background:#1f2c34;border-radius:4px 16px 16px 16px">“¿Venís el domingo al asado?”</p>
+</div>
+<div data-build-in="rise 1" style="position:absolute;left:1000px;top:455px;width:792px;display:flex;flex-direction:column;gap:18px;padding:28px;background:#0e1319;border:1px solid #27313c;border-radius:24px">
+<div style="display:flex;gap:20px;align-items:center">
+<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg, #3ee6ef 0%, #a78bfa 100%)"><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:36px;font-weight:700;color:#07090c">S</p></div>
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">PERFIL B</p><p style="font-size:36px;font-weight:700">@sofi.quispe<span style="color:#ff5f57">_</span></p></div>
+</div>
+<div style="display:flex;gap:12px">
+<div style="display:flex;gap:10px;align-items:center;padding:10px 16px;background:#2a1517;border-radius:12px"><x-icon name="Users" style="color:#ff5f57;width:28px;height:28px"></x-icon><p style="font-size:24px">12 seguidores</p></div>
+<div style="display:flex;gap:10px;align-items:center;padding:10px 16px;background:#2a1517;border-radius:12px"><x-icon name="Clock" style="color:#ff5f57;width:28px;height:28px"></x-icon><p style="font-size:24px">2 días</p></div>
+<div style="display:flex;gap:10px;align-items:center;padding:10px 16px;background:#2a1517;border-radius:12px"><x-icon name="Chat" style="color:#ff5f57;width:28px;height:28px"></x-icon><p style="font-size:24px">Nunca hablaron</p></div>
+</div>
+<p style="font-size:26px;line-height:1.35;padding:14px 18px;background:#1f2c34;border-radius:4px 16px 16px 16px">“Necesito $50.000 <span style="color:#ff5f57"><b>urgente</b></span>, después te explico”</p>
+</div>
+<div data-build-in="rise 2" style="position:absolute;left:128px;top:568px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">1</p></div>
+<p style="flex:1;font-size:28px">El nombre tiene un guion bajo de más</p>
+</div>
+<div data-build-in="rise 3" style="position:absolute;left:128px;top:656px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">2</p></div>
+<p style="flex:1;font-size:28px">Pocos seguidores y cuenta nueva</p>
+</div>
+<div data-build-in="rise 4" style="position:absolute;left:128px;top:744px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">3</p></div>
+<p style="flex:1;font-size:28px">Pide plata con urgencia</p>
+</div>
+<div data-build-in="rise 5" style="position:absolute;left:128px;top:832px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#10170b;border:1px solid #4b5e22;border-radius:14px;box-shadow:0 0 30px rgba(198,255,79,0.12)">
+<x-icon name="CheckCircle" style="color:#c6ff4f;width:40px;height:40px"></x-icon>
+<p style="flex:1;font-size:28px;font-weight:600">Verificá: llamala o preguntale en persona</p>
+</div>
+<p data-build-in="pop 5" style="position:absolute;left:1600px;top:110px;width:170px;padding:8px 0;text-align:center;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:28px;font-weight:700;letter-spacing:3px;color:#07090c;background:#c6ff4f;border-radius:12px;transform:rotate(-6deg);box-shadow:0 0 24px rgba(198,255,79,0.6)">REAL</p>
+<p data-build-in="pop 5" style="position:absolute;left:1600px;top:437px;width:170px;padding:8px 0;text-align:center;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:28px;font-weight:700;letter-spacing:3px;color:#07090c;background:#ff5f57;border-radius:12px;transform:rotate(-6deg);box-shadow:0 0 24px rgba(255,95,87,0.6)">FALSO</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 04 / 09 →</p>
+<aside>EXPONE: integrante 2 · TIEMPO: 45 segundos.
 
-      function renderSlide(index) {
-        current = Math.max(0, Math.min(index, slides.length - 1));
-        slides.forEach((slide, i) => {
-          slide.classList.toggle('active', i === current);
-          slide.setAttribute('aria-hidden', String(i !== current));
-        });
-        progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
-        currentNumber.textContent = String(current + 1);
-        currentTitle.textContent = slides[current].dataset.title;
-        prevBtn.disabled = current === 0;
-        nextBtn.textContent = current === slides.length - 1 ? 'Volver al inicio' : 'Siguiente';
-        stopAudio();
-        closeNotes();
-        slides[current].focus({ preventScroll: true });
-      }
+SECUENCIA (cada flecha → es un paso):
+0. Solo el CONCEPTO: "Suplantar es hacerse pasar por otro: una persona, un banco o una empresa."
+1. EL PROBLEMA: dos perfiles con la misma foto y nombre. "¿Cuál le creerían?"
+2 a 4. Pistas: guion bajo de más, 12 seguidores y 2 días, pide plata urgente.
+5. Sellos REAL / FALSO y la acción: verificar por otro canal.
+Frase de cierre: "La foto y el nombre se copian; la historia no."
+(Perfiles ficticios creados para la clase.)
 
-      function closeNotes() {
-        notesDrawer.hidden = true;
-        notesBtn.setAttribute('aria-expanded', 'false');
-      }
+MAYER — Preentrenamiento: concepto antes del caso. Señalización: las diferencias del perfil falso en coral. Segmentación: observar, buscar pistas, revelar. Multimedia: comparación visual en lugar de una explicación larga.</aside>
+</section>
 
-      prevBtn.addEventListener('click', () => renderSlide(current - 1));
-      nextBtn.addEventListener('click', () => renderSlide(current === slides.length - 1 ? 0 : current + 1));
+<section id="codigo" data-transition="fade" style="background:radial-gradient(circle at 75% 45%, #141f0b 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(198,255,79,0.04) 0px, rgba(198,255,79,0.04) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(198,255,79,0.04) 0px, rgba(198,255,79,0.04) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1065px;height:8px;background:#c6ff4f;box-shadow:0 0 18px #c6ff4f"></div>
+<div style="position:absolute;left:128px;top:128px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Key" style="color:#c6ff4f;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#c6ff4f">// CONCEPTO 03</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:780px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;color:#c6ff4f;text-shadow:0 0 30px rgba(198,255,79,0.45)">Código</h2>
+<p style="position:absolute;left:128px;top:284px;width:780px;font-size:32px;line-height:1.35;color:#c9d2db">El código de verificación es una llave temporal. No se comparte con nadie.</p>
+<div style="position:absolute;left:128px;top:404px;width:780px;height:2px;background:linear-gradient(90deg, #c6ff4f 0%, rgba(198,255,79,0) 100%)"></div>
+<div data-build-in="fade 1" style="position:absolute;left:128px;top:432px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Search" style="color:#ff5f57;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#ff5f57">// EL PROBLEMA · 5 SEGUNDOS</p>
+</div>
+<p data-build-in="fade 1" style="position:absolute;left:128px;top:484px;width:780px;font-size:36px;font-weight:700;line-height:1.2">Te llega este mensaje. ¿Qué hacés?</p>
+<template class="embed" data-build-in="fade 1" style="position:absolute;left:1136px;top:128px;width:520px;height:792px"><meta charset="utf-8"><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:transparent;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f4f7fa}
+.ph{position:relative;height:100%;border:10px solid #1d232b;border-radius:48px;background:#0b141a;overflow:hidden;display:flex;flex-direction:column}
+.hd{display:flex;gap:14px;align-items:center;padding:34px 22px 18px;background:#1f2c34}
+.av{width:60px;height:60px;border-radius:50%;background:#3b4a54;flex:none}
+.nm{font-size:26px;font-weight:700}.st{font-size:24px;color:#8fa3ad}.st.w{color:#25d366}
+.bn{font-size:24px;text-align:center;padding:10px;background:#3a1d1d;color:#ffb4ae}
+.ch{flex:1;display:flex;flex-direction:column;gap:16px;padding:24px 20px}
+.b{max-width:420px;padding:16px 18px;background:#1f2c34;border-radius:4px 18px 18px 18px;font-size:26px;line-height:1.35;opacity:0;transform:translateY(14px);transition:all .4s}
+.b.on{opacity:1;transform:none}
+.c{color:#c6ff4f}.u{color:#ff5f57}
+.sms{position:absolute;left:16px;right:16px;top:-220px;padding:18px 20px;border-radius:20px;background:#e9edf1;color:#111;font-size:24px;line-height:1.35;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:top .5s}
+.sms.on{top:24px}.sms b{display:block;color:#555}.sms i{font-style:normal;font-weight:800;color:#0a7a2f}
+</style><div class="ph"><div class="hd"><div class="av"></div><div><div class="nm">+54 9 11 6234-0017</div><div class="st" id="st">en línea</div></div></div><div class="bn">No está en tus contactos</div><div class="ch"><div class="b" id="b1">Hola ma, cambié de número. Agendame este.</div><div class="b" id="b2">Te llegó un <b class="c">código</b> por SMS. ¿Me lo pasás? Es <b class="u">urgente</b>.</div><div class="b" id="b3">¿Ma? Rápido porfa</div></div><div class="sms" id="sms"><b>Mensajes · ahora</b>Tu código de WhatsApp: <i>472-981</i>. No lo compartas con nadie.</div></div><script>
+var $=function(i){return document.getElementById(i)},st=$('st');
+function ty(on){st.textContent=on?'escribiendo…':'en línea';st.className=on?'st w':'st'}
+var S=[[600,function(){ty(1)}],[2000,function(){ty(0);$('b1').className='b on'}],[3000,function(){ty(1)}],[4600,function(){ty(0);$('b2').className='b on'}],[6000,function(){$('sms').className='sms on'}],[9200,function(){$('sms').className='sms'}],[9800,function(){ty(1)}],[11000,function(){ty(0);$('b3').className='b on'}],[15500,function(){['b1','b2','b3'].forEach(function(i){$(i).className='b'})}]];
+function run(){S.forEach(function(s){setTimeout(s[1],s[0])});setTimeout(run,16500)}run();
+</script></template>
+<div data-build-in="rise 2" data-reveal="3" style="position:absolute;left:128px;top:568px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #ff5f57"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">A</p></div>
+<p style="flex:1;font-size:28px">Le paso el código para ayudarlo</p>
+</div>
+<div data-build-in="rise 2" data-reveal="3" style="position:absolute;left:128px;top:656px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #c6ff4f"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#c6ff4f">B</p></div>
+<p style="flex:1;font-size:28px">Lo llamo al número de siempre</p>
+</div>
+<div data-build-in="pop 3" style="position:absolute;left:128px;top:744px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#10170b;border:2px solid #c6ff4f;border-radius:14px;box-shadow:0 0 30px rgba(198,255,79,0.25)">
+<x-icon name="CheckCircle" style="color:#c6ff4f;width:40px;height:40px"></x-icon>
+<p style="flex:1;font-size:28px;font-weight:700;color:#c6ff4f">B. Ese código abre tu WhatsApp.</p>
+</div>
+<div data-build-in="rise 4" style="position:absolute;left:128px;top:832px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0b1418;border:1px solid #1f4549;border-radius:14px">
+<x-icon name="Verified" style="color:#3ee6ef;width:40px;height:40px"></x-icon>
+<p style="flex:1;font-size:26px">Extra: activá la verificación en 2 pasos</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 05 / 09 →</p>
+<aside>EXPONE: integrante 2 · TIEMPO: 45 segundos.
 
-      notesBtn.addEventListener('click', () => {
-        const opening = notesDrawer.hidden;
-        notesDrawer.hidden = !opening;
-        notesBtn.setAttribute('aria-expanded', String(opening));
-        if (opening) {
-          notesDrawer.innerHTML = slides[current].querySelector('.speaker-notes').innerHTML;
-          notesDrawer.focus();
-        }
-      });
-      notesDrawer.tabIndex = -1;
+SECUENCIA (cada flecha → es un paso):
+0. Solo el CONCEPTO: "El código de verificación es una llave temporal; no se comparte con nadie, ni con la familia."
+1. EL PROBLEMA: el chat cobra vida. Escribe, llega el SMS con el código y la presión ("¿Ma? Rápido porfa"). Leelo con tono apurado.
+2. Opciones A y B. Contá 5, 4, 3, 2, 1 y que levanten la mano.
+3. Respuesta: B. Quien tiene ese código entra a tu WhatsApp y pide plata a tus contactos.
+4. Extra: verificación en dos pasos (WhatsApp › Ajustes › Cuenta).
+(Chat y número ficticios.)
 
-      document.getElementById('fullscreenBtn').addEventListener('click', async () => {
-        try {
-          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
-          else await document.exitFullscreen();
-        } catch (_) {
-          /* Fullscreen may be blocked by the browser; the presentation remains usable. */
-        }
-      });
+MAYER — Preentrenamiento: concepto antes del caso. Multimedia: chat animado parecido al real. Señalización: "código" en lima y "urgente" en coral. Personalización: "¿Qué hacés?".</aside>
+</section>
 
-      function stopAudio() {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        audioBtn.setAttribute('aria-pressed', 'false');
-        audioBtn.querySelector('.audio-label').textContent = ' Escuchar';
-      }
+<section id="enlaces" data-transition="fade" style="background:radial-gradient(circle at 75% 45%, #170f2a 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(167,139,250,0.05) 0px, rgba(167,139,250,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(167,139,250,0.05) 0px, rgba(167,139,250,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1278px;height:8px;background:#a78bfa;box-shadow:0 0 18px #a78bfa"></div>
+<div style="position:absolute;left:128px;top:128px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Link" style="color:#a78bfa;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#a78bfa">// CONCEPTO 04</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:780px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;color:#a78bfa;text-shadow:0 0 30px rgba(167,139,250,0.55)">Enlace sospechoso</h2>
+<p style="position:absolute;left:128px;top:284px;width:780px;font-size:32px;line-height:1.35;color:#c9d2db">Un link que hay que revisar antes de tocar: puede robar datos o instalar algo.</p>
+<div style="position:absolute;left:128px;top:404px;width:780px;height:2px;background:linear-gradient(90deg, #a78bfa 0%, rgba(167,139,250,0) 100%)"></div>
+<div data-build-in="fade 1" style="position:absolute;left:128px;top:432px;width:780px;display:flex;gap:14px;align-items:center">
+<x-icon name="Search" style="color:#ff5f57;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#ff5f57">// EL PROBLEMA · SIMULACIÓN</p>
+</div>
+<p data-build-in="fade 1" style="position:absolute;left:128px;top:484px;width:780px;font-size:36px;font-weight:700;line-height:1.2">Buscabas una peli gratis y…</p>
+<template class="embed" data-build-in="fade 1" style="position:absolute;left:1000px;top:128px;width:792px;height:792px"><meta charset="utf-8"><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:transparent;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f4f7fa}
+.br{position:relative;height:100%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#161b22;border:1px solid #3b3366}
+.tb{display:flex;gap:10px;align-items:center;padding:16px 18px;background:#1f252e}
+.d{display:block;width:14px;height:14px;border-radius:50%}
+.url{flex:1;font:24px monospace;padding:10px 14px;border-radius:10px;background:#0b0e12;color:#a9b4bf;white-space:nowrap;overflow:hidden}
+.url span{color:#ff5f57}
+.n{width:40px;height:40px;border-radius:50%;background:#a78bfa;color:#07090c;font-weight:900;font-size:24px;display:flex;align-items:center;justify-content:center;flex:none}
+.bd{position:relative;flex:1;background:linear-gradient(135deg,#2a1240,#120a22 60%,#07090c);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.pl{width:140px;height:140px;border-radius:50%;border:4px solid #6d5a95;display:flex;align-items:center;justify-content:center;animation:pu 2s infinite}
+.pl:after{content:'';border-left:46px solid #8f7cb8;border-top:28px solid transparent;border-bottom:28px solid transparent;margin-left:12px}
+@keyframes pu{50%{transform:scale(1.07)}}
+.ld{font-size:26px;color:#a99bc8}
+.bar{width:360px;height:10px;border-radius:5px;background:#2e2547;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#a78bfa}
+.pp{position:absolute;padding:22px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:scale(.6);opacity:0;transition:all .35s}
+.pp.on{transform:scale(1);opacity:1}
+.p1{left:36px;top:36px;width:470px;background:#fff4f3;border:3px solid #ff5f57;color:#b3261e}
+.p2{right:36px;bottom:36px;width:470px;background:#f4f7fa;border:3px solid #a78bfa;color:#1b1f24}
+.row{display:flex;gap:12px;align-items:center;font-size:26px;font-weight:800}
+.t{font-size:24px;margin:10px 0;color:#444}
+.cd{font-size:72px;font-weight:900;color:#ff5f57;text-align:center;line-height:1}
+.bt{margin-top:12px;padding:12px;text-align:center;border-radius:10px;font-size:24px;font-weight:800;color:#fff}
+.p1 .bt{background:#ff5f57;animation:bl .5s infinite alternate}.p2 .bt{background:#2f6fde;animation:bo .7s infinite alternate}
+@keyframes bl{to{opacity:.55}}@keyframes bo{to{transform:translateY(-5px)}}
+.ov{position:absolute;inset:0;background:rgba(7,9,12,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;transition:opacity .4s;text-align:center}
+.ov.on{opacity:1}.ov b{font-size:64px;color:#c6ff4f}.ov p{font-size:28px;margin:0;max-width:560px;line-height:1.4}
+</style><div class="br"><div class="tb"><i class="d" style="background:#ff5f57"></i><i class="d" style="background:#f5c542"></i><i class="d" style="background:#4fd36b"></i><div class="url"><span>pelisgratis-hd.xyz</span>/ver-estreno</div><div class="n">1</div></div>
+<div class="bd"><div class="pl"></div><div class="ld">Cargando película…</div><div class="bar"><i id="bar"></i></div>
+<div class="pp p1" id="p1"><div class="row"><div class="n">2</div>¡Tu celular tiene 3 virus!</div><div class="t">Se borrará todo en</div><div class="cd" id="cd">5</div><div class="bt">LIMPIAR AHORA</div></div>
+<div class="pp p2" id="p2"><div class="row"><div class="n">3</div>Instalá el Reproductor HD</div><div class="t">Necesario para ver la película</div><div class="bt">DESCARGAR .APK</div></div>
+<div class="ov" id="ov"><b>PAUSA</b><p>Era una simulación. Lo seguro: cerrar la pestaña sin tocar nada.</p></div></div></div><script>
+var $=function(i){return document.getElementById(i)},iv;
+function run(){clearInterval(iv);var b=$('bar');b.style.transition='none';b.style.width='0';$('p1').className='pp p1';$('p2').className='pp p2';$('ov').className='ov';$('cd').textContent='5';
+setTimeout(function(){b.style.transition='width 1.4s linear';b.style.width='35%'},300);
+setTimeout(function(){$('p1').className='pp p1 on';var s=5;iv=setInterval(function(){s--;$('cd').textContent=s;if(s<=0)clearInterval(iv)},1000)},1800);
+setTimeout(function(){$('p2').className='pp p2 on'},7800);
+setTimeout(function(){$('ov').className='ov on'},11500);
+setTimeout(run,15500)}
+run();
+</script></template>
+<div data-build-in="rise 2" style="position:absolute;left:128px;top:568px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #a78bfa"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#a78bfa">1</p></div>
+<p style="flex:1;font-size:28px">Dirección rara: “.xyz” y nombre largo</p>
+</div>
+<div data-build-in="rise 3" style="position:absolute;left:128px;top:656px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #a78bfa"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#a78bfa">2</p></div>
+<p style="flex:1;font-size:28px">Alarma falsa con cuenta regresiva</p>
+</div>
+<div data-build-in="rise 4" style="position:absolute;left:128px;top:744px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#0e1319;border:1px solid #27313c;border-radius:14px">
+<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #a78bfa"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#a78bfa">3</p></div>
+<p style="flex:1;font-size:28px">Te piden instalar un archivo</p>
+</div>
+<div data-build-in="rise 5" style="position:absolute;left:128px;top:832px;width:780px;display:flex;gap:16px;align-items:center;padding:16px 20px;background:#10170b;border:1px solid #4b5e22;border-radius:14px;box-shadow:0 0 30px rgba(198,255,79,0.12)">
+<x-icon name="CheckCircle" style="color:#c6ff4f;width:40px;height:40px"></x-icon>
+<p style="flex:1;font-size:28px;font-weight:600">Cerrá la pestaña sin tocar nada</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Concepto y problema</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 06 / 09 →</p>
+<aside>EXPONE: integrante 3 · TIEMPO: 45 segundos.
 
-      audioBtn.addEventListener('click', () => {
-        if (!('speechSynthesis' in window)) {
-          audioBtn.querySelector('.audio-label').textContent = ' Audio no disponible';
-          return;
-        }
-        if (audioBtn.getAttribute('aria-pressed') === 'true') {
-          stopAudio();
-          return;
-        }
-        const visibleCopy = slides[current].cloneNode(true);
-        visibleCopy.querySelector('.speaker-notes')?.remove();
-        visibleCopy.querySelectorAll('button').forEach(button => button.remove());
-        const utterance = new SpeechSynthesisUtterance(visibleCopy.innerText.replace(/\s+/g, ' ').trim());
-        utterance.lang = 'es-AR';
-        utterance.rate = 0.95;
-        utterance.onend = stopAudio;
-        utterance.onerror = stopAudio;
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
-        audioBtn.setAttribute('aria-pressed', 'true');
-        audioBtn.querySelector('.audio-label').textContent = ' Detener';
-      });
+SECUENCIA (cada flecha → es un paso):
+0. Solo el CONCEPTO: "Un enlace sospechoso es un link que hay que revisar antes de tocar."
+1. EL PROBLEMA: arranca la simulación de una página de pelis "gratis": alarma de virus con cuenta regresiva, pedido de instalar un archivo y al final PAUSA. Aclarar que es una simulación.
+2 a 4. Pistas con los mismos números que en la página.
+5. Acción segura: cerrar la pestaña sin tocar nada.
+En voz alta: lo mismo con apps de "internet gratis" y Wi-Fi públicas: no usarlas para el banco.
+(Página ficticia creada para la clase.)
 
-      document.addEventListener('keydown', (event) => {
-        if (document.getElementById('simulationDialog').open) return;
-        if (event.key === 'ArrowRight' || event.key === 'PageDown') renderSlide(current + 1);
-        if (event.key === 'ArrowLeft' || event.key === 'PageUp') renderSlide(current - 1);
-        if (event.key === 'Escape') closeNotes();
-      });
+MAYER — Preentrenamiento: concepto antes del caso. Contigüidad espacial: los números de la página coinciden con los de las pistas. Contigüidad temporal: la explicación acompaña la animación. Coherencia: una sola situación de riesgo.</aside>
+</section>
 
-      let touchStartX = 0;
-      document.getElementById('deck').addEventListener('touchstart', event => {
-        touchStartX = event.changedTouches[0].clientX;
-      }, { passive: true });
-      document.getElementById('deck').addEventListener('touchend', event => {
-        const delta = event.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(delta) > 70) renderSlide(current + (delta < 0 ? 1 : -1));
-      }, { passive: true });
+<section id="cuentas" data-transition="fade" style="background:radial-gradient(circle at 20% 70%, #0c1a20 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(62,230,239,0.05) 0px, rgba(62,230,239,0.05) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1491px;height:8px;background:#3ee6ef;box-shadow:0 0 18px #3ee6ef"></div>
+<div style="position:absolute;left:128px;top:128px;width:1200px;display:flex;gap:14px;align-items:center">
+<x-icon name="Lock" style="color:#3ee6ef;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#3ee6ef">// PREVENIR</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:1664px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;text-shadow:0 0 30px rgba(62,230,239,0.35)">Protegé tu cuenta en <span style="color:#3ee6ef">capas</span></h2>
+<img src="assets/codigo-post.jpg" alt="Publicación de concientización: un código puede abrir toda tu cuenta, no lo compartas" style="position:absolute;left:128px;top:300px;width:420px;height:527px;object-fit:cover;border-radius:20px;border:1px solid #1f4549;box-shadow:0 0 60px rgba(62,230,239,0.15)">
+<p style="position:absolute;left:128px;top:845px;width:420px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Campaña real · @QUIETRD__</p>
+<div data-build-in="rise 1" style="position:absolute;left:640px;top:300px;width:1152px;display:flex;gap:28px;align-items:center;padding:24px 28px;background:#0e1319;border:1px solid #27313c;border-radius:18px">
+<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:#0b1e22;border:1px solid #1f4549"><x-icon name="Key" style="color:#3ee6ef;width:44px;height:44px"></x-icon></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:34px;font-weight:700"><span style="color:#3ee6ef">Capa 1 ·</span> Una contraseña distinta por cuenta</h3><p style="font-size:26px;color:#a9b4bf">Larga y distinta: si una cae, las demás siguen a salvo.</p></div>
+</div>
+<div data-build-in="rise 2" style="position:absolute;left:640px;top:450px;width:1152px;display:flex;gap:28px;align-items:center;padding:24px 28px;background:#0e1319;border:1px solid #27313c;border-radius:18px">
+<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:#121a0b;border:1px solid #4b5e22"><x-icon name="Verified" style="color:#c6ff4f;width:44px;height:44px"></x-icon></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:34px;font-weight:700"><span style="color:#c6ff4f">Capa 2 ·</span> Verificación en dos pasos</h3><p style="font-size:26px;color:#a9b4bf">Aunque roben tu clave, sin el segundo paso no entran.</p></div>
+</div>
+<div data-build-in="rise 3" style="position:absolute;left:640px;top:600px;width:1152px;display:flex;gap:28px;align-items:center;padding:24px 28px;background:#0e1319;border:1px solid #27313c;border-radius:18px">
+<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:#15122a;border:1px solid #3b3366"><x-icon name="Settings" style="color:#a78bfa;width:44px;height:44px"></x-icon></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:34px;font-weight:700"><span style="color:#a78bfa">Capa 3 ·</span> Sesiones bajo control</h3><p style="font-size:26px;color:#a9b4bf">Mirá dónde está abierta tu cuenta y cerrá lo extraño.</p></div>
+</div>
+<div data-build-in="rise 4" style="position:absolute;left:640px;top:750px;width:1152px;display:flex;gap:28px;align-items:center;padding:24px 28px;background:#0e1319;border:1px solid #27313c;border-radius:18px">
+<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:#1c0f12;border:1px solid #5a2b29"><x-icon name="Globe" style="color:#ff5f57;width:44px;height:44px"></x-icon></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:34px;font-weight:700"><span style="color:#ff5f57">Capa 4 ·</span> Descargas y Wi-Fi con cuidado</h3><p style="font-size:26px;color:#a9b4bf">Apps de la tienda oficial. Nada de banco en Wi-Fi pública.</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Prevenir</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 07 / 09 →</p>
+<aside>EXPONE: integrante 3 · TIEMPO: 35 segundos.
 
-      document.querySelectorAll('[data-hook-answer]').forEach(button => {
-        button.addEventListener('click', () => {
-          const answer = document.getElementById('hookAnswer');
-          answer.textContent = button.dataset.hookAnswer === 'check'
-            ? 'Buena decisión: confirmar por otro canal aporta evidencia.'
-            : 'La urgencia busca que comparta una llave de acceso antes de verificar.';
-          replayFeedback(answer);
-        });
-      });
+GUION: "Como una casa con varias cerraduras: si una falla, quedan otras." Cada flecha → agrega una capa.
+Capa 1: una frase-contraseña larga y distinta por cuenta (nunca pedir contraseñas reales al grupo).
+Capa 2: verificación en dos pasos: el escudo más fuerte contra el robo del código.
+Capa 3: revisar los dispositivos conectados y cerrar los que no reconozcan.
+Capa 4: apps solo de la tienda oficial y nada de operaciones del banco en Wi-Fi pública ni con apps de "internet gratis".
+La publicación de la izquierda es un ejemplo real de campaña de concientización en redes.
 
-      const clues = [...document.querySelectorAll('.clue')];
-      clues.forEach(clue => clue.addEventListener('click', () => {
-        clue.classList.toggle('open');
-        clue.setAttribute('aria-expanded', String(clue.classList.contains('open')));
-        const count = clues.filter(item => item.classList.contains('open')).length;
-        const clueCount = document.getElementById('clueCount');
-        clueCount.textContent = `${count} de ${clues.length} señales abiertas`;
-        replayFeedback(clueCount);
-      }));
+MAYER — Segmentación: una capa por paso. Señalización: número de capa, color e ícono propios. Modalidad: en pantalla quedan palabras clave; el detalle se dice en voz alta. Multimedia: ejemplo real junto a las capas.</aside>
+</section>
 
-      const dialog = document.getElementById('simulationDialog');
-      const timer = document.getElementById('timer');
-      const message = document.getElementById('simulationMessage');
-      let countdownId = null;
-      function resetSimulation() {
-        if (countdownId) clearInterval(countdownId);
-        countdownId = null;
-        if (dialog.open) dialog.close();
-        timer.textContent = '5';
-        timer.classList.remove('sim-result');
-        timer.classList.remove('counting');
-        message.textContent = 'Detectamos actividad inusual. No cierre esta ventana.';
-      }
-      document.getElementById('startSimulation').addEventListener('click', () => {
-        let seconds = 5;
-        resetSimulation();
-        dialog.showModal();
-        timer.textContent = String(seconds);
-        timer.classList.add('counting');
-        countdownId = setInterval(() => {
-          seconds -= 1;
-          timer.textContent = String(seconds);
-          if (seconds === 0) {
-            clearInterval(countdownId);
-            countdownId = null;
-            timer.textContent = 'FIN';
-            timer.classList.remove('counting');
-            timer.classList.add('sim-result');
-            message.textContent = 'Simulación finalizada. La urgencia y el bloqueo aparente intentaban dirigir su conducta.';
-            setTimeout(() => {
-              if (dialog.open) dialog.close();
-              renderSlide(3);
-            }, 260);
-          }
-        }, 1000);
-      });
-      dialog.addEventListener('cancel', event => event.preventDefault());
+<section id="recuperacion" data-transition="fade" style="background:radial-gradient(circle at 50% 100%, #121a0b 0%, #07090c 55%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(198,255,79,0.04) 0px, rgba(198,255,79,0.04) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(198,255,79,0.04) 0px, rgba(198,255,79,0.04) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1704px;height:8px;background:#c6ff4f;box-shadow:0 0 18px #c6ff4f"></div>
+<div style="position:absolute;left:128px;top:128px;width:1200px;display:flex;gap:14px;align-items:center">
+<x-icon name="Wrench" style="color:#c6ff4f;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#c6ff4f">// SI YA PASÓ · ACTUÁ RÁPIDO</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:1664px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.05;text-shadow:0 0 30px rgba(198,255,79,0.3)">Ya hiciste clic: <span style="color:#c6ff4f">¿qué hacés?</span></h2>
+<div data-build-in="rise 1" style="position:absolute;left:128px;top:300px;width:392px;display:flex;flex-direction:column;background:#0e1319;border:1px solid #27313c;border-radius:20px;overflow:hidden">
+<img src="assets/r-enlace.jpg" alt="Una persona cerró una página sospechosa y ve un aviso de página no disponible" style="width:392px;height:260px;object-fit:cover">
+<div style="display:flex;flex-direction:column;gap:12px;padding:24px">
+<div style="display:flex;gap:12px;align-items:center"><x-icon name="Link" style="color:#ff5f57;width:32px;height:32px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">SITUACIÓN 01</p></div>
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:32px;font-weight:700;line-height:1.15">Solo abrí el enlace</h3>
+<p style="font-size:26px;line-height:1.4;color:#a9b4bf"><span style="color:#c6ff4f"><b>Cerrá</b></span> la página. No escribas datos y revisá tus descargas.</p>
+</div>
+</div>
+<div data-build-in="rise 2" style="position:absolute;left:552px;top:300px;width:392px;display:flex;flex-direction:column;background:#0e1319;border:1px solid #27313c;border-radius:20px;overflow:hidden">
+<img src="assets/r-password.jpg" alt="Pantalla de seguridad: contraseña actualizada, cerrar sesiones y verificación en dos pasos activada" style="width:392px;height:260px;object-fit:cover">
+<div style="display:flex;flex-direction:column;gap:12px;padding:24px">
+<div style="display:flex;gap:12px;align-items:center"><x-icon name="Key" style="color:#ff5f57;width:32px;height:32px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">SITUACIÓN 02</p></div>
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:32px;font-weight:700;line-height:1.15">Escribí mi contraseña</h3>
+<p style="font-size:26px;line-height:1.4;color:#a9b4bf"><span style="color:#c6ff4f"><b>Cambiala</b></span> ya y cerrá la sesión en todos los dispositivos.</p>
+</div>
+</div>
+<div data-build-in="rise 3" style="position:absolute;left:976px;top:300px;width:392px;display:flex;flex-direction:column;background:#0e1319;border:1px solid #27313c;border-radius:20px;overflow:hidden">
+<img src="assets/r-banco.jpg" alt="Página de contacto oficial del banco mientras una persona sostiene su tarjeta" style="width:392px;height:260px;object-fit:cover">
+<div style="display:flex;flex-direction:column;gap:12px;padding:24px">
+<div style="display:flex;gap:12px;align-items:center"><x-icon name="Lock" style="color:#ff5f57;width:32px;height:32px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">SITUACIÓN 03</p></div>
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:32px;font-weight:700;line-height:1.15">Di datos de mi tarjeta</h3>
+<p style="font-size:26px;line-height:1.4;color:#a9b4bf"><span style="color:#c6ff4f"><b>Llamá</b></span> al banco por su línea oficial y pausá la tarjeta.</p>
+</div>
+</div>
+<div data-build-in="rise 4" style="position:absolute;left:1400px;top:300px;width:392px;display:flex;flex-direction:column;background:#0e1319;border:1px solid #27313c;border-radius:20px;overflow:hidden">
+<img src="assets/r-acceso.jpg" alt="Pantalla oficial de recuperar cuenta que pide el código enviado al correo o al teléfono" style="width:392px;height:260px;object-fit:cover">
+<div style="display:flex;flex-direction:column;gap:12px;padding:24px">
+<div style="display:flex;gap:12px;align-items:center"><x-icon name="Users" style="color:#ff5f57;width:32px;height:32px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;color:#ff5f57">SITUACIÓN 04</p></div>
+<h3 style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:32px;font-weight:700;line-height:1.15">Perdí mi cuenta</h3>
+<p style="font-size:26px;line-height:1.4;color:#a9b4bf"><span style="color:#c6ff4f"><b>Recuperala</b></span> desde la app oficial y avisá a tus contactos.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Actuar</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 08 / 09 →</p>
+<aside>EXPONE: integrante 4 · TIEMPO: 45 segundos.
 
-      const recoveryMessages = {
-        link: 'Cierre la página. Si no ingresó datos ni instaló archivos, revise las descargas y vuelva al servicio desde su aplicación o dirección oficial.',
-        password: 'Cambie la contraseña desde el sitio oficial, cierre las sesiones abiertas y active el segundo factor. Cambie también cualquier contraseña reutilizada.',
-        bank: 'Comuníquese con la entidad por su canal oficial, informe lo ocurrido y siga sus indicaciones para proteger cuentas, tarjetas y operaciones.',
-        account: 'Inicie la recuperación oficial de la cuenta, avise a sus contactos por otro medio y revise los datos de recuperación cuando vuelva a ingresar.'
-      };
-      document.querySelectorAll('[data-incident]').forEach(option => {
-        option.addEventListener('click', () => {
-          document.querySelectorAll('[data-incident]').forEach(item => item.classList.remove('selected'));
-          option.classList.add('selected');
-          const advice = document.getElementById('recoveryAdvice');
-          advice.textContent = recoveryMessages[option.dataset.incident];
-          replayFeedback(advice);
-        });
-      });
+SECUENCIA: cada flecha → agrega una situación (01 a 04). Leé solo el verbo en lima y la acción; la imagen muestra la pantalla que van a ver.
+01 — Si no escribiste datos ni instalaste nada, cerrar alcanza.
+02 — Cambiá también las contraseñas de otras cuentas que usen la misma clave.
+03 — Llamá al número que está detrás de tu tarjeta o en la app del banco, nunca al que te pasaron por mensaje.
+04 — Avisá en tus estados o por SMS que no sos vos: el delincuente va a pedir plata en tu nombre.
+Si te hackearon el celular: modo avión, sacar el chip y ponerlo en otro teléfono; como último paso, restablecer de fábrica.
+Frase clave: "La vergüenza demora; pedir ayuda rápido reduce el daño."
 
-      document.querySelectorAll('[data-quiz]').forEach(option => {
-        option.addEventListener('click', () => {
-          document.querySelectorAll('[data-quiz]').forEach(item => item.classList.remove('correct', 'incorrect'));
-          const correct = option.dataset.quiz === 'right';
-          option.classList.add(correct ? 'correct' : 'incorrect');
-          const feedback = document.getElementById('quizFeedback');
-          feedback.textContent = correct
-            ? 'Correcto. La identidad visual puede copiarse; confirmar por otro canal aporta evidencia.'
-            : 'Todavía falta verificar. Una foto o la urgencia del mensaje no demuestran quién lo envió.';
-          replayFeedback(feedback);
-        });
-      });
+MAYER — Segmentación: cuatro situaciones, una acción principal cada una. Multimedia: imagen de la acción + frase corta. Señalización: verbo de acción en lima. Modalidad: los detalles van en voz alta.</aside>
+</section>
 
-      renderSlide(0);
-    })();
-  </script>
+<section id="desafio" data-transition="fade" style="background:radial-gradient(circle at 85% 10%, #121a0b 0%, #07090c 50%);color:#f4f7fa;font-family:'Rubik', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(90deg, rgba(198,255,79,0.04) 0px, rgba(198,255,79,0.04) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg, rgba(198,255,79,0.04) 0px, rgba(198,255,79,0.04) 1px, transparent 1px, transparent 96px)"></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:8px;background:linear-gradient(90deg, #3ee6ef 0%, #a78bfa 50%, #c6ff4f 100%);box-shadow:0 0 18px #a78bfa"></div>
+<div style="position:absolute;left:128px;top:128px;width:1200px;display:flex;gap:14px;align-items:center">
+<x-icon name="GraduationCap" style="color:#c6ff4f;width:36px;height:36px"></x-icon>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#c6ff4f">// DESAFÍO FINAL · ¡TODOS VOTAN!</p>
+</div>
+<h2 style="position:absolute;left:128px;top:176px;width:1360px;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:64px;font-weight:700;line-height:1.08;text-shadow:0 0 30px rgba(198,255,79,0.25)">Un amigo te manda un link.<br>¿Qué te da seguridad de abrirlo?</h2>
+<template class="embed" style="position:absolute;left:1552px;top:110px;width:240px;height:210px"><meta charset="utf-8"><style>html,body{margin:0;height:100%;background:#0a0e0a;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f4f7fa}.w{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}.r{position:relative;width:140px;height:140px}svg{width:140px;height:140px;transform:rotate(-90deg)}circle{transition:stroke-dashoffset 1s linear}#n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:900}.l{font-size:24px;color:#a9b4bf}</style><div class="w"><div class="r"><svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="60" fill="none" stroke="#27313c" stroke-width="12"/><circle id="r" cx="70" cy="70" r="60" fill="none" stroke="#c6ff4f" stroke-width="12" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="0"/></svg><div id="n">10</div></div><div class="l" id="l">para pensar</div></div><script>
+var s=10,n=document.getElementById('n'),r=document.getElementById('r'),l=document.getElementById('l');
+function t(){if(s>0){n.textContent=s;n.style.fontSize='56px';n.style.color=s<=3?'#ff5f57':'#f4f7fa';l.textContent='para pensar';r.setAttribute('stroke',s<=3?'#ff5f57':'#c6ff4f');r.setAttribute('stroke-dashoffset',377*(1-s/10));s--;setTimeout(t,1000)}else{n.textContent='¡Ya!';n.style.fontSize='40px';n.style.color='#c6ff4f';l.textContent='¡a votar!';r.setAttribute('stroke-dashoffset',377);setTimeout(function(){s=10;t()},3500)}}
+t();
+</script></template>
+<div data-build-in="rise 1" data-reveal="4" style="position:absolute;left:128px;top:350px;width:539px;height:212px;display:flex;flex-direction:column;gap:14px;padding:28px;background:#0e1319;border:1px solid #27313c;border-radius:20px">
+<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #a9b4bf"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:800">A</p></div>
+<p style="font-size:32px;line-height:1.3;font-weight:600">Tiene su foto de perfil</p>
+</div>
+<div data-build-in="rise 2 auto" data-reveal="4" style="position:absolute;left:691px;top:350px;width:539px;height:212px;display:flex;flex-direction:column;gap:14px;padding:28px;background:#0e1319;border:1px solid #27313c;border-radius:20px">
+<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #a9b4bf"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:800">B</p></div>
+<p style="font-size:32px;line-height:1.3;font-weight:600">Lo llamé y me confirmó que lo mandó</p>
+</div>
+<div data-build-in="rise 3 auto" data-reveal="4" style="position:absolute;left:1254px;top:350px;width:539px;height:212px;display:flex;flex-direction:column;gap:14px;padding:28px;background:#0e1319;border:1px solid #27313c;border-radius:20px">
+<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #a9b4bf"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:800">C</p></div>
+<p style="font-size:32px;line-height:1.3;font-weight:600">El mensaje dice que es urgente</p>
+</div>
+<div data-build-in="fade 4" style="position:absolute;left:128px;top:350px;width:539px;height:212px;display:flex;flex-direction:column;justify-content:end;padding:24px 28px;background:rgba(7,9,12,0.8);border:2px solid #ff5f57;border-radius:20px">
+<p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;font-weight:700;color:#ff5f57">No alcanza: la foto se copia</p>
+</div>
+<div data-build-in="fade 4" style="position:absolute;left:1254px;top:350px;width:539px;height:212px;display:flex;flex-direction:column;justify-content:end;padding:24px 28px;background:rgba(7,9,12,0.8);border:2px solid #ff5f57;border-radius:20px">
+<p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:30px;font-weight:700;color:#ff5f57">No alcanza: es una trampa</p>
+</div>
+<x-shape kind="rounded" data-build-in="pop 4" style="position:absolute;left:683px;top:342px;width:555px;height:228px;background:transparent;border:4px solid #c6ff4f;box-shadow:0 0 40px rgba(198,255,79,0.45)"></x-shape>
+<p data-build-in="pop 4" style="position:absolute;left:1010px;top:322px;width:210px;padding:6px 0;text-align:center;font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:26px;font-weight:700;color:#07090c;background:#c6ff4f;border-radius:999px;box-shadow:0 0 20px rgba(198,255,79,0.6)">¡Correcta!</p>
+<div data-build-in="rise 5" style="position:absolute;left:128px;top:636px;width:1664px;display:flex;flex-direction:column;gap:18px;padding:32px 40px;background:#0b0f0b;border:1px solid #2d3a1f;border-radius:24px;box-shadow:0 0 60px rgba(167,139,250,0.12)">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#a9b4bf">// LA REGLA PARA RECORDAR</p>
+<div style="display:flex;gap:56px;align-items:center">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Clock" style="color:#3ee6ef;width:64px;height:64px"></x-icon><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.0;color:#3ee6ef;text-shadow:0 0 30px rgba(62,230,239,0.6)">Pausá.</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Search" style="color:#a78bfa;width:64px;height:64px"></x-icon><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.0;color:#a78bfa;text-shadow:0 0 30px rgba(167,139,250,0.6)">Verificá.</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="CheckCircle" style="color:#c6ff4f;width:64px;height:64px"></x-icon><p style="font-family:'Chakra Petch', 'Trebuchet MS', sans-serif;font-size:80px;font-weight:700;line-height:1.0;color:#c6ff4f;text-shadow:0 0 30px rgba(198,255,79,0.6)">Actuá.</p></div>
+</div>
+<p style="font-size:24px;color:#a9b4bf">Más en <a href="https://www.argentina.gob.ar/justicia/convosenlaweb">argentina.gob.ar/justicia/convosenlaweb</a> · Con vos en la Web, Ministerio de Justicia</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7d8a97">Ciudadanía digital · Evaluar y cerrar</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;color:#7d8a97">← 09 / 09</p>
+<aside>EXPONE: integrante 4 · TIEMPO: 1 minuto.
+
+SECUENCIA:
+Al entrar: corre el reloj de 10 segundos "para pensar" (arriba a la derecha).
+1. Flecha →: entran las opciones A, B y C en cascada. Que voten con los dedos: 1, 2 o 3.
+2. Flecha →: se tachan A y C ("No alcanza") y se marca B como correcta.
+3. Flecha →: aparece la regla Pausá. Verificá. Actuá. Decila en voz alta con todo el grupo.
+Cierre: "¿Cuál va a ser tu regla personal?"
+
+MAYER — Práctica de recuperación: el grupo aplica lo aprendido a un caso nuevo. Personalización: votan y responden. Señalización: coral para lo que no alcanza, lima para la correcta. Coherencia: el cierre es una sola regla.
+
+Fuente: Ministerio de Justicia de la Nación, Con vos en la Web — https://www.argentina.gob.ar/justicia/convosenlaweb</aside>
+</section>
+
+</div>
+</main>
+<nav class="controls" aria-label="Controles de la presentación">
+<div class="group">
+<button class="btn" id="prev" aria-label="Anterior"><span aria-hidden="true">←</span><span class="label">Anterior</span></button>
+<button class="btn" id="notesBtn" aria-expanded="false" aria-controls="notes"><span aria-hidden="true">☰</span><span class="label">Notas</span></button>
+</div>
+<div class="center">
+<div class="count"><b id="num">1</b> / <span id="tot">9</span> · <span id="ttl"></span></div>
+<div class="dots" id="dots"></div>
+</div>
+<div class="group right">
+<button class="btn" id="audioBtn" aria-pressed="false"><span aria-hidden="true">🔊</span><span class="label" id="audioLbl">Escuchar</span></button>
+<button class="btn" id="fsBtn" aria-label="Pantalla completa"><span aria-hidden="true">⛶</span></button>
+<button class="btn primary" id="next" aria-label="Siguiente"><span class="label" id="nextLbl">Siguiente</span><span aria-hidden="true">→</span></button>
+</div>
+</nav>
+<aside class="notes" id="notes" hidden tabindex="-1"></aside>
+<script>
+(function(){
+var ICONS={
+Lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+Clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+Search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+CheckCircle:'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+Globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+Chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+GraduationCap:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+Verified:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+Users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+Warning:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+Key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+Link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+Settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+Wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'
+};
+var SVGNS='http://www.w3.org/2000/svg';
+function css(el){return el.getAttribute('style')||''}
+
+/* x-icon -> svg */
+document.querySelectorAll('x-icon').forEach(function(x){
+  var s=document.createElementNS(SVGNS,'svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('class','ico');
+  s.setAttribute('style',css(x));s.setAttribute('aria-hidden','true');s.innerHTML=ICONS[x.getAttribute('name')]||ICONS.CheckCircle;
+  x.replaceWith(s);
+});
+/* x-shape -> div */
+document.querySelectorAll('x-shape').forEach(function(x){
+  var d=document.createElement('div');d.className='shape';var k=x.getAttribute('kind');
+  d.setAttribute('style',css(x)+';border-radius:'+(k==='ellipse'?'50%':'22px'));
+  if(x.dataset.buildIn)d.dataset.buildIn=x.dataset.buildIn;x.replaceWith(d);
+});
+/* x-connector -> svg arrow */
+var mk=0;
+document.querySelectorAll('x-connector').forEach(function(x){
+  var col=(css(x).match(/color:\s*([^;]+)/)||[])[1]||'#ff5f57',w=(css(x).match(/border-width:\s*(\d+)/)||[])[1]||3,id='ah'+(mk++);
+  var s=document.createElementNS(SVGNS,'svg');s.setAttribute('viewBox','0 0 1920 1080');
+  s.setAttribute('style','position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none');
+  s.innerHTML='<defs><marker id="'+id+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="'+col+'"/></marker></defs><line x1="'+x.getAttribute('x1')+'" y1="'+x.getAttribute('y1')+'" x2="'+x.getAttribute('x2')+'" y2="'+x.getAttribute('y2')+'" stroke="'+col+'" stroke-width="'+w+'" marker-end="url(#'+id+')" style="filter:drop-shadow(0 0 6px '+col+')"/>';
+  if(x.dataset.buildIn)s.dataset.buildIn=x.dataset.buildIn;x.replaceWith(s);
+});
+/* template.embed -> iframe */
+document.querySelectorAll('template.embed').forEach(function(t){
+  var f=document.createElement('iframe');f.className='embed';f.setAttribute('style',t.getAttribute('style'));
+  f.setAttribute('title',t.getAttribute('data-title')||'Animación');f.setAttribute('tabindex','-1');
+  f._src='<!doctype html><meta charset="utf-8">'+t.innerHTML;
+  if(t.dataset.buildIn)f.dataset.buildIn=t.dataset.buildIn;t.replaceWith(f);
+});
+
+var slides=[].slice.call(document.querySelectorAll('#stage>section'));
+var stage=document.getElementById('stage'),cur=-1,gen=0,shown=0,groups=[];
+var bar=document.getElementById('bar'),num=document.getElementById('num'),ttl=document.getElementById('ttl');
+document.getElementById('tot').textContent=slides.length;
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* builds */
+slides.forEach(function(s){
+  var map={};
+  s.querySelectorAll('[data-build-in]').forEach(function(el){
+    var p=el.dataset.buildIn.split(/\s+/),kind=p[0],ord=parseInt(p[1]||'1',10),auto=p.indexOf('auto')>-1;
+    el.classList.add('bi');if(kind==='rise'||kind==='pop')el.classList.add(kind);
+    (map[ord]=map[ord]||{ord:ord,auto:false,els:[]}).els.push(el);if(auto)map[ord].auto=true;
+  });
+  s._groups=Object.keys(map).map(Number).sort(function(a,b){return a-b}).map(function(k){return map[k]});
+});
+function setGroup(g,on){g.els.forEach(function(e){e.classList.toggle('on',on)})}
+function playAutos(myGen){
+  var g=groups[shown];
+  if(!g||!g.auto)return;
+  setTimeout(function(){if(myGen!==gen)return;setGroup(g,true);shown++;playAutos(myGen)},reduce?0:420);
+}
+function scale(){
+  var vp=document.getElementById('viewport'),w=vp.clientWidth,h=vp.clientHeight,k=Math.min(w/1920,h/1080);
+  stage.style.transform='scale('+k+') translate(-50%,-50%)';
+}
+window.addEventListener('resize',scale);
+var dots=document.getElementById('dots');
+slides.forEach(function(s,i){var b=document.createElement('button');b.className='dot';b.setAttribute('aria-label','Ir a la diapositiva '+(i+1));b.onclick=function(){go(i,false)};dots.appendChild(b)});
+function title(s){var h=s.querySelector('h1,h2');if(!h)return '';var c=h.cloneNode(true);c.querySelectorAll('br').forEach(function(b){b.replaceWith(' ')});return c.textContent.replace(/\s+/g,' ').trim()}
+window.addEventListener('hashchange',function(){var n=parseInt(location.hash.slice(1),10)-1;if(!isNaN(n)&&n!==cur)go(Math.max(0,Math.min(slides.length-1,n)),false)});
+function go(i,full){
+  if(i<0||i>=slides.length)return;
+  gen++;stopAudio();
+  if(cur>-1){slides[cur].classList.remove('active');slides[cur].querySelectorAll('iframe.embed').forEach(function(f){f.removeAttribute('srcdoc')})}
+  cur=i;var s=slides[cur];s.classList.add('active');
+  s.querySelectorAll('iframe.embed').forEach(function(f){f.srcdoc=f._src});
+  groups=s._groups;shown=0;groups.forEach(function(g){setGroup(g,!!full)});if(full)shown=groups.length;
+  if(!full)playAutos(gen);
+  bar.style.width=((cur+1)/slides.length*100)+'%';num.textContent=cur+1;ttl.textContent=title(s);
+  [].forEach.call(dots.children,function(d,k){d.classList.toggle('on',k===cur);if(k<=cur)d.classList.add('seen')});
+  document.getElementById('prev').disabled=cur===0&&shown===0;
+  document.getElementById('nextLbl').textContent=cur===slides.length-1?'Inicio':'Siguiente';
+  if(!document.getElementById('notes').hidden)fillNotes();
+  history.replaceState(null,'','#'+(cur+1));
+  if(s.id==='portada')startParticles();
+}
+function next(){
+  var g=groups[shown];
+  if(g){gen++;setGroup(g,true);shown++;playAutos(gen);document.getElementById('prev').disabled=false;return}
+  go(cur===slides.length-1?0:cur+1,false);
+}
+function prev(){
+  var last=-1;for(var k=shown-1;k>=0;k--){if(!groups[k].auto){last=k;break}}
+  if(last>-1){gen++;for(var j=last;j<shown;j++)setGroup(groups[j],false);shown=last;return}
+  if(cur>0)go(cur-1,true);
+}
+function revealTo(ord){gen++;while(groups[shown]&&groups[shown].ord<=ord){setGroup(groups[shown],true);shown++}playAutos(gen)}
+document.querySelectorAll('[data-reveal]').forEach(function(el){el.setAttribute('tabindex','0');el.setAttribute('role','button');
+  var f=function(){revealTo(parseInt(el.dataset.reveal,10))};el.addEventListener('click',f);el.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();f()}})});
+document.getElementById('next').onclick=next;
+document.getElementById('prev').onclick=prev;
+document.addEventListener('keydown',function(e){
+  if(e.target.closest&&e.target.closest('[data-reveal]')&&e.key==='Enter')return;
+  if(['ArrowRight','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();next()}
+  else if(['ArrowLeft','PageUp'].indexOf(e.key)>-1){e.preventDefault();prev()}
+  else if(e.key==='Home')go(0,false);else if(e.key==='End')go(slides.length-1,true);
+  else if(e.key==='Escape')closeNotes();
+});
+var tx=0;document.getElementById('viewport').addEventListener('touchstart',function(e){tx=e.changedTouches[0].clientX},{passive:true});
+document.getElementById('viewport').addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>60)(d<0?next:prev)()},{passive:true});
+
+/* notas */
+var notes=document.getElementById('notes'),nb=document.getElementById('notesBtn');
+function fillNotes(){var a=slides[cur].querySelector('aside');notes.innerHTML='<h3>NOTAS · DIAPOSITIVA '+(cur+1)+'</h3>';notes.appendChild(document.createTextNode(a?a.textContent.trim():'Sin notas.'))}
+function closeNotes(){notes.hidden=true;nb.setAttribute('aria-expanded','false')}
+nb.onclick=function(){if(notes.hidden){fillNotes();notes.hidden=false;nb.setAttribute('aria-expanded','true')}else closeNotes()};
+
+/* audio */
+var ab=document.getElementById('audioBtn'),al=document.getElementById('audioLbl');
+function stopAudio(){if('speechSynthesis' in window)speechSynthesis.cancel();ab.setAttribute('aria-pressed','false');al.textContent='Escuchar'}
+ab.onclick=function(){
+  if(!('speechSynthesis' in window)){al.textContent='Sin audio';return}
+  if(ab.getAttribute('aria-pressed')==='true'){stopAudio();return}
+  var c=slides[cur].cloneNode(true);c.querySelectorAll('aside,iframe,svg').forEach(function(n){n.remove()});
+  c.querySelectorAll('p').forEach(function(p){if(/\d+ \/ \d+/.test(p.textContent))p.remove()});
+  var u=new SpeechSynthesisUtterance(c.textContent.replace(/\/\//g,'').replace(/\s+/g,' ').trim());
+  u.lang='es-AR';u.rate=.92;u.onend=stopAudio;u.onerror=stopAudio;speechSynthesis.cancel();speechSynthesis.speak(u);
+  ab.setAttribute('aria-pressed','true');al.textContent='Detener';
+};
+document.getElementById('fsBtn').onclick=function(){try{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}catch(e){}};
+
+/* partículas de portada */
+var pRun=false;
+function startParticles(){
+  var c=document.querySelector('#portada canvas.particles');if(!c||pRun||reduce)return;pRun=true;
+  var x=c.getContext('2d'),W=c.width=1920,H=c.height=1080,P=[],cols=['#3ee6ef','#3ee6ef','#3ee6ef','#ff5f57','#a78bfa'],k=0;
+  function sp(){return{t:0,s:.0016+Math.random()*.0026,o:(Math.random()-.5)*.12,z:6+Math.random()*12,c:cols[Math.random()*5|0],ph:Math.random()*6.28}}
+  for(var i=0;i<70;i++){var p=sp();p.t=Math.random();P.push(p)}
+  function pt(t,o){var x0=330,y0=560,x1=1660,y1=380,cx=960,cy=120,u=1-t;return[u*u*x0+2*u*t*cx+t*t*x1,u*u*y0+2*u*t*cy+t*t*y1+o*H*Math.sin(t*3.14)]}
+  function f(){
+    if(!slides[cur]||slides[cur].id!=='portada'){pRun=false;x.clearRect(0,0,W,H);return}
+    k+=.02;x.clearRect(0,0,W,H);
+    for(var i=0;i<P.length;i++){var p=P[i];p.t+=p.s;if(p.t>1){P[i]=sp();continue}
+      var q=pt(p.t,p.o+Math.sin(p.t*9+p.ph)*.012),a=Math.sin(p.t*3.14);
+      x.globalAlpha=a*.85;x.shadowBlur=p.z*2;x.shadowColor=p.c;x.fillStyle=p.c;x.fillRect(q[0]-p.z/2,q[1]-p.z/2,p.z,p.z)}
+    requestAnimationFrame(f)}
+  f();
+}
+
+scale();
+var start=parseInt((location.hash||'#1').slice(1),10)-1;go(isNaN(start)?0:Math.max(0,Math.min(slides.length-1,start)),false);
+setTimeout(function(){document.getElementById('hint').classList.add('off')},4500);
+})();
+</script>
 </body>
 </html>

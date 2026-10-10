@@ -1,13 +1,28 @@
-PRESENTACIÓN WEB: CIUDADANÍA DIGITAL
+PRESENTACIÓN WEB: CIUDADANÍA DIGITAL — DECISIONES QUE PROTEGEN
 
-1. Abra index.html con Microsoft Edge, Chrome o Firefox.
-2. Use los botones o las flechas izquierda/derecha para cambiar de diapositiva.
-3. El botón “Notas” muestra un guion breve y los principios de Mayer aplicados.
-4. El botón “Escuchar” utiliza la voz disponible en el navegador y no envía el texto a este proyecto.
-5. El botón de pantalla completa mejora la proyección en clase.
-6. La simulación es local: no captura datos, no descarga archivos y solo desactiva los controles de la presentación durante tres segundos.
+Cómo verla
+1. Abrí index.html en Edge, Chrome o Firefox (o el enlace publicado en Vercel).
+2. Navegación: flechas ← → del teclado, los botones "Anterior / Siguiente", los puntos de abajo, o deslizando en el celular.
+   La flecha → también revela las pistas de a una; la flecha ← las vuelve a ocultar.
+3. En las diapositivas de Código y Desafío se puede tocar una opción para ver la respuesta.
+4. "Notas" muestra el guion de cada diapositiva: quién expone, cuánto tiempo y los principios de Mayer aplicados.
+5. "Escuchar" lee la diapositiva con la voz del navegador (no envía datos a ningún lado).
+6. ⛶ pone la presentación en pantalla completa.
+7. Se puede abrir directo en una diapositiva agregando #número al final del enlace (ej. #5).
 
-La carpeta “assets” debe permanecer junto a index.html para que las imágenes se vean.
+Estructura (9 diapositivas, 6 minutos, 4 integrantes)
+1. Portada — 2. Ciudadanía digital responsable — 3. Estafa — 4. Suplantación — 5. Código —
+6. Enlace sospechoso — 7. Protegé tu cuenta en capas — 8. Si ya hiciste clic — 9. Desafío y regla final.
+En 3 a 6, primero se ve el concepto y después el problema real, con pistas paso a paso.
+
+Las simulaciones (chat de WhatsApp, página de pelis "gratis", alarma de virus) son locales:
+no capturan datos, no descargan archivos y no usan internet. Perfiles, chat y página son ficticios.
+
+La carpeta "assets" debe quedar junto a index.html para que se vean las imágenes.
+Publicación: es un sitio estático; Vercel lo sirve tal cual desde la raíz del repositorio, sin configuración.
+
+Fuente: Ministerio de Justicia de la Nación, Con vos en la Web — https://www.argentina.gob.ar/justicia/convosenlaweb
 
 NOTA SOBRE NOTEBOOKLM
-El borrador del grupo indica que NotebookLM es obligatorio. Esta versión incorpora el contenido del borrador, pero no afirma haber utilizado NotebookLM. Si la cátedra exige evidencia de uso, todavía deben cargar allí las fuentes y conservar el resultado o registro correspondiente.
+La consigna indica que NotebookLM es obligatorio. Esta presentación no afirma haberlo usado:
+si la cátedra exige evidencia, carguen allí las fuentes y conserven el resultado o registro.
